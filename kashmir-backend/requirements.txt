@@ -9,3 +9,7 @@ feedparser
 beautifulsoup4
 cachetools
 python-jose[cryptography]
+supabase
+python-multipart
+tweepy
+Pillow

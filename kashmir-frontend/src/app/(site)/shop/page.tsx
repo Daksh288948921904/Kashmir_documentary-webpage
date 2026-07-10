@@ -3,8 +3,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { PRODUCTS, SHOP_CATEGORIES } from '@/content/products';
+import { SHOP_CATEGORIES } from '@/content/products';
 import type { Product } from '@/content/products';
+import { CONFIG } from '@/lib/config';
+
+const API = `${CONFIG.api.baseUrl}${CONFIG.api.prefix}`;
 
 type CartItem = Product & { qty: number };
 type CheckoutForm = { name: string; email: string; phone: string; address: string };
@@ -12,13 +15,23 @@ type CheckoutForm = { name: string; email: string; phone: string; address: strin
 export default function ShopPage() {
   const router = useRouter();
   const [filter, setFilter]           = useState('all');
+  const [products, setProducts]       = useState<Product[]>([]);
   const [cart, setCart]               = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen]       = useState(false);
   const [checkoutOpen, setCheckout]   = useState(false);
   const [ordered, setOrdered]         = useState(false);
   const [form, setForm]               = useState<CheckoutForm>({ name: '', email: '', phone: '', address: '' });
 
-  const filtered   = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === filter);
+  useEffect(() => {
+    fetch(`${API}/products`)
+      .then(r => r.json())
+      .then((data: (Omit<Product, 'desc' | 'img'> & { description: string; img_url: string })[]) => {
+        setProducts(data.map(p => ({ ...p, desc: p.description, img: p.img_url })));
+      })
+      .catch(console.error);
+  }, []);
+
+  const filtered   = filter === 'all' ? products : products.filter((p: Product) => p.category === filter);
   const itemCount  = cart.reduce((s, i) => s + i.qty, 0);
   const total      = cart.reduce((s, i) => s + i.price * i.qty, 0);
 
@@ -46,8 +59,27 @@ export default function ShopPage() {
     );
   }, []);
 
-  const placeOrder = () => {
+  const [orderError, setOrderError] = useState('');
+
+  const placeOrder = async () => {
     if (!isFormValid) return;
+    setOrderError('');
+    const res = await fetch(`${API}/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_name: form.name,
+        customer_email: form.email,
+        customer_phone: form.phone,
+        delivery_address: form.address,
+        items: cart.map(i => ({ id: i.id, name: i.name, weight: i.weight, price: i.price, qty: i.qty })),
+        total,
+      }),
+    });
+    if (!res.ok) {
+      setOrderError('Could not place order. Please try again.');
+      return;
+    }
     setCheckout(false);
     setOrdered(true);
   };
@@ -247,6 +279,7 @@ export default function ShopPage() {
           isFormValid={isFormValid}
           onClose={() => setCheckout(false)}
           onPlace={placeOrder}
+          error={orderError}
         />
       )}
 
@@ -503,12 +536,13 @@ function CartDrawer({ cart, open, onClose, onUpdateQty, total, onCheckout }: {
 
 /* ─── CheckoutModal ────────────────────────────────────────────────────────── */
 
-function CheckoutModal({ form, setForm, total, cart, isFormValid, onClose, onPlace }: {
+function CheckoutModal({ form, setForm, total, cart, isFormValid, onClose, onPlace, error }: {
   form: CheckoutForm;
   setForm: React.Dispatch<React.SetStateAction<CheckoutForm>>;
   total: number; cart: CartItem[];
   isFormValid: boolean;
   onClose: () => void; onPlace: () => void;
+  error?: string;
 }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -610,9 +644,11 @@ function CheckoutModal({ form, setForm, total, cart, isFormValid, onClose, onPla
         >
           Place Order →
         </button>
-        <p style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--color-ash-text)', textAlign: 'center', marginTop: 'var(--space-3)' }}>
-          This is a demo checkout. No payment is processed.
-        </p>
+        {error && (
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--text-sm)', color: '#e05252', textAlign: 'center', marginTop: 'var(--space-3)' }}>
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );

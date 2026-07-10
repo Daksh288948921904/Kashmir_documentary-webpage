@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FILM } from '@/content/film';
 
 const NAV_LINKS = [
   { label: 'Film',     href: '#film' },
@@ -150,8 +149,27 @@ export default function Nav() {
           </div>
 
           {/* CTA */}
-          {/* Kashmir Harvest link — hidden until shop goes live */}
           <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/shop"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 'var(--text-xs)',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'var(--color-saffron)',
+                border: '1px solid rgba(175,108,30,0.5)',
+                borderRadius: '4px',
+                padding: '0.45rem 1rem',
+                textDecoration: 'none',
+                transition: 'background 200ms, border-color 200ms',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(175,108,30,0.12)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(175,108,30,0.9)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(175,108,30,0.5)'; }}
+            >
+              Kashmir Harvest
+            </Link>
             <a
               href={isShop ? '/#watch' : '#watch'}
               onClick={e => { if (isShop) return; e.preventDefault(); scrollTo('#watch'); }}
@@ -222,7 +240,20 @@ export default function Nav() {
               {link.label}
             </a>
           ))}
-          {/* Harvest mobile link — hidden until shop goes live */}
+          <Link
+            href="/shop"
+            onClick={() => setMenuOpen(false)}
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'var(--text-xl)',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'var(--color-saffron)',
+              textDecoration: 'none',
+            }}
+          >
+            Kashmir Harvest
+          </Link>
           <a
             href={isShop ? '/#watch' : '#watch'}
             onClick={e => { if (isShop) { setMenuOpen(false); return; } e.preventDefault(); scrollTo('#watch'); setMenuOpen(false); }}

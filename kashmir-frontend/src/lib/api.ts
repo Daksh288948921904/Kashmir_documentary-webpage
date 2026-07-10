@@ -133,3 +133,36 @@ export const api = {
     } catch { return null; }
   },
 };
+
+/* ─────────────────────────────────────────────────────────────
+   KASHMIR HARVEST CMS helpers
+   JWT stored in localStorage, passed as Bearer token.
+───────────────────────────────────────────────────────────── */
+
+export function getCmsToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('cms_token');
+}
+
+export function setCmsToken(token: string): void {
+  localStorage.setItem('cms_token', token);
+}
+
+export function clearCmsToken(): void {
+  localStorage.removeItem('cms_token');
+}
+
+function cmsHeaders(extra?: Record<string, string>): Record<string, string> {
+  const token = getCmsToken();
+  return {
+    ...(extra ?? {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+export async function cmsApi(path: string, init?: RequestInit): Promise<Response> {
+  return fetch(`${BASE}${path}`, {
+    ...init,
+    headers: cmsHeaders(init?.headers as Record<string, string>),
+  });
+}

@@ -33,6 +33,28 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 1440
 
+    # Supabase
+    supabase_url: str = ""
+    supabase_service_role_key: str = ""
+
+    # Kashmir Harvest CMS
+    cms_password: str = ""
+    cms_jwt_secret: str = "cms-dev-secret"
+
+    # Brevo email
+    brevo_api_key: str = ""
+    brevo_from_email: str = "harvest@kashmirharvest.in"
+    brevo_admin_email: str = ""
+
+    # Ayrshare (social media publishing)
+    ayrshare_api_key: str = ""
+
+    # X / Twitter BYOK credentials (passed as headers to Ayrshare)
+    x_api_key: str = ""
+    x_api_secret: str = ""
+    x_access_token: str = ""
+    x_access_token_secret: str = ""
+
     class Config:
         env_file = str(_APP_DIR / ".env")
         env_file_encoding = "utf-8"
