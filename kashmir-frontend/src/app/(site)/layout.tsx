@@ -1,4 +1,3 @@
-import Script from 'next/script';
 import { FILM } from '@/content/film';
 import { CONFIG } from '@/lib/config';
 import Grain              from '@/components/effects/Grain';
@@ -7,6 +6,7 @@ import TemperatureOverlay from '@/components/effects/TemperatureOverlay';
 import CursorGlow         from '@/components/effects/CursorGlow';
 import SmoothScroll       from '@/components/effects/SmoothScroll';
 import Nav from '@/components/layout/Nav';
+import ConsentBanner from '@/components/ui/ConsentBanner';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -30,18 +30,18 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {/* Skip to main content — keyboard / screen-reader navigation */}
+      <a href="#main-content" className="skip-link">Skip to content</a>
       <SmoothScroll>
+        {/* Persistent atmospheric effects */}
         <AtmosphereCanvas />
         <TemperatureOverlay />
         <Grain />
         <CursorGlow />
         <Nav />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
+        <ConsentBanner />
       </SmoothScroll>
-      <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="lazyOnload"
-      />
     </>
   );
 }
