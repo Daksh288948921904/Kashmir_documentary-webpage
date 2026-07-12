@@ -114,7 +114,7 @@ export default function FilmOverview() {
               letterSpacing: '0.20em', textTransform: 'uppercase',
               color: 'var(--color-ash-text)',
             }}>
-              Official Selection
+              Selected For
             </span>
           </div>
         </div>
@@ -400,7 +400,7 @@ export default function FilmOverview() {
             color: 'var(--color-ash-text)',
             marginTop: 'var(--space-4)',
           }}>
-            Secure payment · Razorpay · Instant access
+            Secure payment · Airpay · Instant access
           </p>
         </div>
       </div>

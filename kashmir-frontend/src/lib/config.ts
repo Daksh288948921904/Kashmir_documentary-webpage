@@ -5,20 +5,20 @@
  */
 
 export const CONFIG = {
-  /* ── Backend API ───────────────────────
+  /* ── Backend API ───────────────────────────────
      Same-origin: the backend now lives in Next.js API routes under /api.
      baseUrl is empty so requests resolve to relative '/api/...'.
-  ─────────────────────────────────────── */
+  ───────────────────────────────────────────── */
   api: {
     baseUrl: process.env.NEXT_PUBLIC_API_URL ?? '',
     prefix: '/api',
     timeoutMs: 10_000,
   },
 
-  /* ── Film Identity ─────────────────────
+  /* ── Film Identity ─────────────────────────────
      Source of truth: src/content/film.ts
      Backend returns stale data — do NOT use for identity.
-  ─────────────────────────────────────── */
+  ───────────────────────────────────────────── */
   film: {
     title: 'Kashmir — Fighting for Peace',
     titleShort: 'Kashmir',
@@ -33,7 +33,7 @@ export const CONFIG = {
     certificate: 'U/A',
   },
 
-  /* ── Pricing ────────────────────────── */
+  /* ── Pricing ─────────────────────────────── */
   pricing: {
     currency: 'INR',
     currencySymbol: '₹',
@@ -43,14 +43,14 @@ export const CONFIG = {
     description: 'Lifetime Access · Full HD',
   },
 
-  /* ── Payment ────────────────────────── */
+  /* ── Payment ─────────────────────────────── */
   payment: {
     provider: 'airpay' as const,
     callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/api/payment/callback`,
     devBypass: process.env.NEXT_PUBLIC_DEV_BYPASS_PAYMENT === 'true',
   },
 
-  /* ── Media ───────────────────────────── */
+  /* ── Media ────────────────────────────────── */
   media: {
     /* Trailer URL — empty = coming soon state */
     trailerUrl: process.env.NEXT_PUBLIC_TRAILER_URL ?? '',
@@ -86,7 +86,7 @@ export const CONFIG = {
     mapEnabled: true,
   },
 
-  /* ── Effects Flags ───────────────────── */
+  /* ── Effects Flags ────────────────────────── */
   effects: {
     grainEnabled: true,
     cursorEnabled: true,
@@ -100,7 +100,7 @@ export const CONFIG = {
     atmosphereNoiseEnabled: true,
   },
 
-  /* ── Social Links ────────────────────── */
+  /* ── Social Links ─────────────────────────── */
   social: {
     instagram: '',
     twitter: '',
@@ -108,20 +108,24 @@ export const CONFIG = {
     facebook: '',
   },
 
-  /* ── Duality Section ─────────────────── */
+  /* ── Duality Section ──────────────────────── */
   duality: {
     enabled: true,
     ctaHref: '#watch',
     ctaLabel: 'Watch the Film',
   },
 
-  /* ── SEO ─────────────────────────────── */
+  /* ── SEO ──────────────────────────────────── */
   seo: {
     siteName: 'Kashmir — Fighting for Peace',
+    // REQUIRED BEFORE DEPLOYMENT: set NEXT_PUBLIC_SITE_URL=https://yourdomain.com in your hosting env vars.
+    // Without it, sitemap, canonical tags, and structured data will point to localhost.
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
     defaultDescription:
       'A documentary about ordinary people living in extraordinary circumstances. Kashmir — Fighting for Peace by Rig 360 Media.',
-    ogImage: 'https://images.pexels.com/photos/14651212/pexels-photo-14651212.jpeg?auto=compress&cs=tinysrgb&w=1200&q=80',
+    // REQUIRED BEFORE DEPLOYMENT: add your own /public/og-image.jpg and set NEXT_PUBLIC_OG_IMAGE_URL=https://yourdomain.com/og-image.jpg
+    // Without a self-hosted image, broken Pexels URLs will break every social share preview.
+    ogImage: process.env.NEXT_PUBLIC_OG_IMAGE_URL ?? 'https://images.pexels.com/photos/14651212/pexels-photo-14651212.jpeg?auto=compress&cs=tinysrgb&w=1200&q=80',
   },
 } as const;
 

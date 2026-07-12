@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import { Playfair_Display, DM_Sans, Space_Mono } from 'next/font/google';
 import './globals.css';
 import { CONFIG } from '@/lib/config';
+import { FILM } from '@/content/film';
+
+/* ── Fonts ───────────────────────────────────────── */
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -25,6 +28,8 @@ const spaceMono = Space_Mono({
   display: 'swap',
 });
 
+/* ── Metadata ────────────────────────────────── */
+
 export const metadata: Metadata = {
   title: {
     default: CONFIG.film.title,
@@ -42,7 +47,14 @@ export const metadata: Metadata = {
     siteName: CONFIG.seo.siteName,
     title: CONFIG.film.title,
     description: CONFIG.seo.defaultDescription,
-    images: [{ url: CONFIG.seo.ogImage, width: 1200, height: 630, alt: CONFIG.film.title }],
+    images: [
+      {
+        url: CONFIG.seo.ogImage,
+        width: 1200,
+        height: 630,
+        alt: CONFIG.film.title,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -50,7 +62,10 @@ export const metadata: Metadata = {
     description: CONFIG.seo.defaultDescription,
     images: [CONFIG.seo.ogImage],
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export const viewport: Viewport = {
@@ -60,14 +75,45 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+/* ── JSON-LD ─────────────────────────────────── */
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Movie',
+  name: FILM.title,
+  description: FILM.synopsis.long,
+  director: {
+    '@type': 'Organization',
+    name: FILM.productionCompany,
+  },
+  productionCompany: {
+    '@type': 'Organization',
+    name: FILM.productionCompany,
+  },
+  genre: [...FILM.genres],
+  duration: `PT${FILM.durationMinutes}M`,
+  inLanguage: ['hi', 'en'],
+  contentRating: FILM.certificate,
+  url: CONFIG.seo.siteUrl,
+  image: CONFIG.seo.ogImage,
+};
+
+/* ── Root Layout ────────────────────────────── */
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="en"
       className={`${playfair.variable} ${dmSans.variable} ${spaceMono.variable}`}
       suppressHydrationWarning
     >
-      <body>{children}</body>
+      <body>
+        {children}
+      </body>
     </html>
   );
 }
