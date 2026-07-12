@@ -119,6 +119,7 @@ export default function CmsProductsPage() {
                   <td style={{ padding: '12px 12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       {p.img_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img src={p.img_url} alt="" style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} />
                       ) : (
                         <div style={{ width: 36, height: 36, borderRadius: '4px', backgroundColor: p.hue, flexShrink: 0, opacity: 0.7 }} />

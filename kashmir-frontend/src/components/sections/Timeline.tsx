@@ -650,7 +650,7 @@ function DocChip({ doc, color, onClick }: { doc: TimelineDoc; color: string; onC
 function DocModal({ doc, color, onClose }: { doc: TimelineDoc; color: string; onClose: () => void }) {
   useEffect(() => {
     /* Stop Lenis smooth scroll while modal is open */
-    const lenis = (window as { lenis?: { stop: () => void; start: () => void } }).lenis;
+    const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
     if (lenis) lenis.stop();
     else document.body.style.overflow = 'hidden';
 

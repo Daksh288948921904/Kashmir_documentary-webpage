@@ -578,9 +578,15 @@ export default function Hero() {
       fireBurstRef.current.classList.add('fire-burst-active');
       setTimeout(() => fireBurstRef.current?.classList.remove('fire-burst-active'), 900);
     }
-    setPhase('montage');
-    setMontageIdx(0);
-  }, [fireDrumHit, startDrone]);
+    // Skip the rapid montage for users who have requested reduced motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      fadeDrone();
+      setPhase('text');
+    } else {
+      setPhase('montage');
+      setMontageIdx(0);
+    }
+  }, [fireDrumHit, startDrone, fadeDrone]);
 
   // ─── Rapid montage — stepped acceleration + drum hit per cut ─────────────
   useEffect(() => {

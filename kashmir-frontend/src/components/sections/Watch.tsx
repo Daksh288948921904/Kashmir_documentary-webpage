@@ -363,7 +363,7 @@ export default function Watch() {
 
     const order = await api.createAirpayOrder({
       email: payEmail.trim(),
-      name: payName.trim(),
+      name:  payName.trim(),
       phone: payPhone.trim(),
     });
 
@@ -380,8 +380,8 @@ export default function Watch() {
 
     for (const [key, value] of Object.entries(order.form_fields)) {
       const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = key;
+      input.type  = 'hidden';
+      input.name  = key;
       input.value = value;
       form.appendChild(input);
     }

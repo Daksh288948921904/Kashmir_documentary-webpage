@@ -37,16 +37,16 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
   const s = getServerSettings();
 
   const merchantId = clean(s.airpayMerchantId);
-  const username = clean(s.airpayUsername);
-  const password = clean(s.airpayPassword);
-  const apiKey = clean(s.airpayApiKey);
+  const username   = clean(s.airpayUsername);
+  const password   = clean(s.airpayPassword);
+  const apiKey     = clean(s.airpayApiKey);
 
-  const txnId = `KFP${Date.now()}`;
-  const amount = String(s.documentaryPriceInr);
+  const txnId    = `KFP${Date.now()}`;
+  const amount   = String(s.documentaryPriceInr);
   const currency = '356'; // INR
 
   const privateKey = sha256(`${apiKey}@${username}:|:${password}`);
-  const sKey = sha256(`${username}~:~${password}`);
+  const sKey       = sha256(`${username}~:~${password}`);
 
   const buyerData = [
     input.email, input.name, input.name, '',
@@ -58,30 +58,30 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
   const checksum = sha256(`${sKey}@${buyerData}`);
 
   const formFields: Record<string, string> = {
-    mercid: merchantId,
-    orderid: txnId,
+    mercid:         merchantId,
+    orderid:        txnId,
     amount,
     currency,
-    isocurrency: 'INR',
-    chmod: '0',
-    buyerEmail: input.email,
-    buyerPhone: input.phone,
+    isocurrency:    'INR',
+    chmod:          '0',
+    buyerEmail:     input.email,
+    buyerPhone:     input.phone,
     buyerFirstName: input.name,
-    buyerLastName: '',
-    buyerAddress: input.address ?? '',
-    buyerCity: input.city ?? '',
-    buyerState: input.state ?? '',
-    buyerCountry: input.country ?? 'India',
-    buyerPinCode: input.pin_code ?? '',
-    privatekey: privateKey,
+    buyerLastName:  '',
+    buyerAddress:   input.address ?? '',
+    buyerCity:      input.city ?? '',
+    buyerState:     input.state ?? '',
+    buyerCountry:   input.country ?? 'India',
+    buyerPinCode:   input.pin_code ?? '',
+    privatekey:     privateKey,
     checksum,
-    txnsubtype: '',
+    txnsubtype:     '',
   };
 
   return {
     transaction_id: txnId,
-    post_url: s.airpayBaseUrl,
-    form_fields: formFields,
+    post_url:       s.airpayBaseUrl,
+    form_fields:    formFields,
   };
 }
 
@@ -89,15 +89,15 @@ export async function verifyAirpayCallback(formData: Record<string, string>): Pr
   const s = getServerSettings();
   const secret = clean(s.airpaySecretKey);
 
-  const txnId = formData.TRANSACTIONID ?? '';
+  const txnId   = formData.TRANSACTIONID ?? '';
   const apTxnId = formData.APTRANSACTIONID ?? '';
-  const amount = formData.AMOUNT ?? '';
-  const status = formData.TRANSACTIONSTATUS ?? '';
+  const amount  = formData.AMOUNT ?? '';
+  const status  = formData.TRANSACTIONSTATUS ?? '';
   const message = formData.MESSAGE ?? '';
-  const apHash = formData.ap_SecureHash ?? '';
+  const apHash  = formData.ap_SecureHash ?? '';
 
   const verifyStr = `${txnId}:${apTxnId}:${amount}:${status}:${message}:${secret}`;
-  const expected = sha256(verifyStr);
+  const expected  = sha256(verifyStr);
 
   if (expected !== apHash) {
     return { verified: false, message: 'Invalid checksum' };
@@ -107,9 +107,9 @@ export async function verifyAirpayCallback(formData: Record<string, string>): Pr
     return { verified: false, message: `Payment failed: ${message}` };
   }
 
-  const key = new TextEncoder().encode(s.jwtSecret);
+  const key        = new TextEncoder().encode(s.jwtSecret);
   const expSeconds = Math.floor(Date.now() / 1000) + s.accessTokenExpireMinutes * 60;
-  const token = await new SignJWT({})
+  const token      = await new SignJWT({})
     .setProtectedHeader({ alg: s.jwtAlgorithm })
     .setSubject(apTxnId || txnId)
     .setExpirationTime(expSeconds)

@@ -80,7 +80,6 @@ export default function NewSocialPostPage() {
       <h1 style={{ margin: '0 0 28px', fontSize: '1.3rem', fontFamily: 'Playfair Display, serif', fontWeight: 400, color: '#e8e4dc' }}>New Post</h1>
       <form onSubmit={handleSubmit} style={{ maxWidth: '600px' }}>
 
-        {/* Platforms */}
         <div style={FIELD}>
           <span style={LABEL}>Publish to</span>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -109,7 +108,6 @@ export default function NewSocialPostPage() {
           </div>
         </div>
 
-        {/* Content type */}
         <div style={FIELD}>
           <span style={LABEL}>Content Type</span>
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -118,7 +116,6 @@ export default function NewSocialPostPage() {
           <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#555', fontFamily: 'Space Mono, monospace' }}>Type only affects Instagram. Facebook and X always post as standard posts.</p>
         </div>
 
-        {/* Media */}
         <div style={FIELD}>
           <span style={LABEL}>Media (optional for Facebook/X, required for Instagram)</span>
           {uploadPreview && <img src={uploadPreview} alt="" style={{ display: 'block', width: '100%', maxHeight: '280px', objectFit: 'contain', borderRadius: '8px', marginBottom: '10px', background: '#0a0c0f' }} />}
@@ -129,7 +126,6 @@ export default function NewSocialPostPage() {
           </label>
         </div>
 
-        {/* Caption */}
         <div style={FIELD}>
           <label style={LABEL} htmlFor="caption">Caption <span style={{ color: '#444' }}>({caption.length}/2200 — Twitter truncates at 280)</span></label>
           <textarea id="caption" value={caption} onChange={e => setCaption(e.target.value.slice(0,2200))} rows={5} placeholder="Write your caption…" style={{ ...INPUT, resize: 'vertical', lineHeight: '1.5' }} />

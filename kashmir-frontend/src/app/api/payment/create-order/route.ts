@@ -9,14 +9,14 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const result = await createAirpayOrder({
-      email: body.email,
-      name: body.name,
-      phone: body.phone,
-      address: body.address,
-      city: body.city,
-      state: body.state,
-      country: body.country,
-      pin_code: body.pin_code,
+      email:     body.email,
+      name:      body.name,
+      phone:     body.phone,
+      address:   body.address,
+      city:      body.city,
+      state:     body.state,
+      country:   body.country,
+      pin_code:  body.pin_code,
     });
     return NextResponse.json(result);
   } catch (e) {

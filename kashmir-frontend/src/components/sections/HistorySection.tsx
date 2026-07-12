@@ -217,7 +217,7 @@ function DocChip({ doc, color, onClick }: { doc: TimelineDoc; color: string; onC
 /* ── DocModal ── */
 function DocModal({ doc, color, onClose }: { doc: TimelineDoc; color: string; onClose: () => void }) {
   useEffect(() => {
-    const lenis = (window as { lenis?: { stop: () => void; start: () => void } }).lenis;
+    const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
     if (lenis) lenis.stop(); else document.body.style.overflow = 'hidden';
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handler);

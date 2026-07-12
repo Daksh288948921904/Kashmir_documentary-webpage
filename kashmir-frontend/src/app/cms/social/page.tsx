@@ -93,7 +93,6 @@ export default function CmsSocialPage() {
         </button>
       </div>
 
-      {/* Platform config status */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
         {(['instagram', 'facebook', 'x'] as const).map(p => {
           const m = PLATFORM_META[p];
@@ -107,7 +106,6 @@ export default function CmsSocialPage() {
         {!anyConfigured && <span style={{ fontSize: '12px', color: '#555', alignSelf: 'center', marginLeft: '4px' }}>No platforms configured — add API keys to .env to enable publishing</span>}
       </div>
 
-      {/* Filters */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
         {['all','post','story','reel'].map(t => <button key={t} style={pill(typeFilter === t)} onClick={() => setTypeFilter(t)}>{t.charAt(0).toUpperCase()+t.slice(1)}</button>)}
         <span style={{ width: '1px', background: 'rgba(255,255,255,0.08)', margin: '0 4px' }} />
@@ -137,6 +135,7 @@ export default function CmsSocialPage() {
                       {p.media_url
                         ? p.media_url.match(/\.(mp4|mov|m4v)$/i)
                           ? <div style={{ width: 48, height: 48, borderRadius: '4px', background: '#1a1d20', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>▶</div>
+                          // eslint-disable-next-line @next/next/no-img-element
                           : <img src={p.media_url} alt="" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: '4px' }} />
                         : <div style={{ width: 48, height: 48, borderRadius: '4px', background: '#1a1d20' }} />
                       }

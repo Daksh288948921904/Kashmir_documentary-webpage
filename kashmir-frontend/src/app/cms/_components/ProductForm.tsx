@@ -176,6 +176,7 @@ export default function ProductForm({ initialData, onSubmit, submitLabel }: Prop
         <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
           <div>
             {form.img_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img src={form.img_url} alt="" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }} />
             ) : (
               <div style={{ width: 72, height: 72, borderRadius: '6px', backgroundColor: form.hue, opacity: 0.4, border: '1px solid rgba(255,255,255,0.08)' }} />

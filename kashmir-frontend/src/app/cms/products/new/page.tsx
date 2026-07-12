@@ -13,7 +13,7 @@ export default function NewProductPage() {
     if (!getCmsToken()) router.replace('/cms');
   }, [router]);
 
-  async function handleSubmit(form: Parameters<typeof ProductForm>[0]['initialData'] & { id: string; name: string; price: string; category: string }) {
+  async function handleSubmit(form: Parameters<typeof ProductForm>[0]['initialData'] & { id: string; name: string; price: string; category: string; sort_order: string }) {
     const res = await cmsApi('/cms/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
