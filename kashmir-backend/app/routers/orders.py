@@ -50,7 +50,48 @@ class OrderUpdate(BaseModel):
 @router.post("/orders")
 async def create_order(body: OrderCreate, background_tasks: BackgroundTasks):
     sb = get_supabase()
+
+    if not body.items:
+        raise HTTPException(status_code=400, detail="Order has no items")
+
+    # ── Trust the database, never the browser, for prices ──────────────
+    # Look up every ordered product server-side and rebuild the line items
+    # and total from authoritative DB prices. This prevents a tampered
+    # client from paying ₹1 for a ₹5,000 cart.
+    product_ids = [item.id for item in body.items]
+    lookup = (
+        sb.table("products")
+        .select("id,name,price,weight,active")
+        .in_("id", product_ids)
+        .execute()
+    )
+    products_by_id = {p["id"]: p for p in (lookup.data or [])}
+
+    verified_items = []
+    server_total = 0.0
+    for item in body.items:
+        product = products_by_id.get(item.id)
+        if product is None or not product.get("active", False):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Product '{item.id}' is unavailable",
+            )
+        if item.qty < 1:
+            raise HTTPException(status_code=400, detail="Invalid quantity")
+        price = float(product["price"])
+        server_total += price * item.qty
+        verified_items.append({
+            "id": item.id,
+            "name": product["name"],
+            "weight": product.get("weight"),
+            "price": price,
+            "qty": item.qty,
+        })
+
     data = body.model_dump()
+    data["items"] = verified_items          # authoritative line items
+    data["total"] = round(server_total, 2)  # authoritative total
+
     res = sb.table("orders").insert(data).execute()
     order = res.data[0]
     background_tasks.add_task(send_order_notification, data)
