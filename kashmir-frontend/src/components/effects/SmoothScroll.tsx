@@ -2,7 +2,11 @@
 
 import { useEffect, useRef } from 'react';
 import Lenis from 'lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CONFIG } from '@/lib/config';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * SmoothScroll — Lenis cinematic scroll provider
@@ -27,21 +31,21 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 
     lenisRef.current = lenis;
 
-    /* Expose lenis globally so GSAP ScrollTrigger can connect later */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    /* Expose lenis globally for components that call lenis.scrollTo() */
     (window as unknown as Record<string, unknown>).lenis = lenis;
 
-    let rafId: number;
+    /* Sync Lenis scroll position into GSAP ScrollTrigger every frame */
+    lenis.on('scroll', ScrollTrigger.update);
 
-    function raf(time: number) {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    }
-
-    rafId = requestAnimationFrame(raf);
+    const tickerFn = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+    gsap.ticker.add(tickerFn);
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      gsap.ticker.remove(tickerFn);
+      lenis.off('scroll', ScrollTrigger.update);
       lenis.destroy();
       delete (window as unknown as Record<string, unknown>).lenis;
     };

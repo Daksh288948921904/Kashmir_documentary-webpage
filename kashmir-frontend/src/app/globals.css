@@ -1,9 +1,9 @@
 @import "../styles/tokens.css";
 @import "tailwindcss";
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    BASE RESET & FOUNDATION
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -20,8 +20,12 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  cursor: none;
   scroll-behavior: auto;
+}
+
+/* Custom cursor only on true pointer devices — not on touch/hybrid screens */
+@media (hover: hover) and (pointer: fine) {
+  html { cursor: none; }
 }
 
 body {
@@ -31,9 +35,9 @@ body {
   min-height: 100vh;
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    TYPOGRAPHY BASE
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
@@ -54,10 +58,35 @@ a {
   text-decoration: none;
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
+   SKIP LINK (keyboard / screen-reader)
+   ──────────────────────────────────────────── */
+
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: 0;
+  z-index: 99999;
+  padding: var(--space-4) var(--space-6);
+  background-color: var(--color-saffron);
+  color: var(--color-deep-slate);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ────────────────────────────────────────────
    CUSTOM CURSOR SYSTEM
    Three layers: dot (instant), ring (lerp 0.18), light (lerp 0.22)
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 .cursor-dot {
   position: fixed;
@@ -117,9 +146,9 @@ a {
   mix-blend-mode: screen;
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    FILM GRAIN OVERLAY
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 .grain-overlay {
   position: fixed;
@@ -133,9 +162,9 @@ a {
   will-change: transform;
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    SECTION FOUNDATIONS
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 .section-container {
   max-width: var(--container-max);
@@ -166,9 +195,9 @@ a {
   z-index: 2;
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    EYEBROW LABELS
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 .eyebrow {
   font-family: var(--font-mono);
@@ -180,9 +209,9 @@ a {
   margin-bottom: var(--space-4);
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    REVEAL ANIMATIONS
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 .will-reveal {
   opacity: 0;
@@ -197,9 +226,9 @@ a {
     transform var(--duration-cinematic) var(--ease-settle);
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    BUTTONS
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 .btn {
   display: inline-flex;
@@ -271,9 +300,9 @@ a {
   transform: translateY(-1px) scale(1.02);
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    NAV
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 .nav-base {
   position: fixed;
@@ -296,27 +325,27 @@ a {
   border-bottom: var(--border-dim);
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    SCROLLBAR
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--color-deep-slate-mid); }
 ::-webkit-scrollbar-thumb { background: var(--color-ash); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-saffron-dim); }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    SELECTION
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 ::selection {
   background-color: rgba(201, 123, 43, 0.25);
   color: var(--color-snow);
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    CARD HOVER
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 .card-hover {
   transition:
@@ -331,9 +360,9 @@ a {
   background-color: var(--color-deep-slate-hi);
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    DUALITY — Keyframes
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 @keyframes duality-ripple {
   0%   { transform: translate(-50%, -50%) scale(0);  opacity: 0.85; }
@@ -360,9 +389,9 @@ a {
   to { transform: rotate(360deg); }
 }
 
-/* ─────────────────────────────────────────────
+/* ────────────────────────────────────────────
    DUALITY — Mobile layout (lower-third)
-   ───────────────────────────────────────────── */
+   ──────────────────────────────────────────── */
 
 @media (max-width: 767px) {
   .duality-layout {

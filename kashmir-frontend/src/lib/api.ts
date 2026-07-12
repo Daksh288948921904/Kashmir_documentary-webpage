@@ -29,12 +29,12 @@ async function get<T>(path: string): Promise<T | null> {
   }
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* ───────────────────────────────────────────────────────────────
    TRANSFORMS
    Backend returns snake_case field names that differ from our
    frontend TypeScript types. These functions normalise the shape
    so components always receive the type they expect.
-───────────────────────────────────────────────────────────── */
+────────────────────────────────────────────────────────────── */
 
 function transformNewsResponse(raw: Record<string, unknown>): NewsResponse | null {
   if (!Array.isArray(raw?.articles)) return null;
@@ -72,9 +72,9 @@ function transformSocialResponse(raw: Record<string, unknown>): SocialResponse |
   };
 }
 
-/* ─────────────────────────────────────────────────────────────
+/* ───────────────────────────────────────────────────────────────
    API CALLS
-───────────────────────────────────────────────────────────── */
+────────────────────────────────────────────────────────────── */
 
 export const api = {
   /* Documentary — field names match backend directly */
@@ -134,10 +134,10 @@ export const api = {
   },
 };
 
-/* ─────────────────────────────────────────────────────────────
+/* ───────────────────────────────────────────────────────────────
    KASHMIR HARVEST CMS helpers
    JWT stored in localStorage, passed as Bearer token.
-───────────────────────────────────────────────────────────── */
+────────────────────────────────────────────────────────────── */
 
 export function getCmsToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -161,8 +161,17 @@ function cmsHeaders(extra?: Record<string, string>): Record<string, string> {
 }
 
 export async function cmsApi(path: string, init?: RequestInit): Promise<Response> {
-  return fetch(`${BASE}${path}`, {
+  const res = await fetch(`${BASE}${path}`, {
     ...init,
     headers: cmsHeaders(init?.headers as Record<string, string>),
   });
+  // Session expired or invalid → clear it and send the admin back to login,
+  // instead of leaving them staring at a raw 401 error on a CMS page.
+  if (res.status === 401 && typeof window !== 'undefined') {
+    clearCmsToken();
+    if (window.location.pathname !== '/cms') {
+      window.location.href = '/cms';
+    }
+  }
+  return res;
 }
