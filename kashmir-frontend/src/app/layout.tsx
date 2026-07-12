@@ -4,7 +4,7 @@ import './globals.css';
 import { CONFIG } from '@/lib/config';
 import { FILM } from '@/content/film';
 
-/* ── Fonts ───────────────────────────────────────── */
+/* ── Fonts ──────────────────────────────────────── */
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -28,7 +28,7 @@ const spaceMono = Space_Mono({
   display: 'swap',
 });
 
-/* ── Metadata ────────────────────────────────── */
+/* ── Metadata ──────────────────────────────────── */
 
 export const metadata: Metadata = {
   title: {
@@ -75,7 +75,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-/* ── JSON-LD ─────────────────────────────────── */
+/* ── JSON-LD ───────────────────────────────────── */
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -98,7 +98,7 @@ const jsonLd = {
   image: CONFIG.seo.ogImage,
 };
 
-/* ── Root Layout ────────────────────────────── */
+/* ── Root Layout ───────────────────────────────── */
 
 export default function RootLayout({
   children,

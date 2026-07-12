@@ -97,7 +97,7 @@ export default function ShopPage() {
   return (
     <div style={{ minHeight: '100vh', paddingTop: '72px', backgroundColor: 'var(--color-deep-slate)', position: 'relative', zIndex: 1 }}>
 
-      {/* ── Shop sub-header ────────────────────────── */}
+      {/* ── Shop sub-header ─────────────────────────────────── */}
       <div style={{
         position: 'sticky', top: '72px', zIndex: 50,
         backgroundColor: 'rgba(10,12,15,0.95)',
@@ -169,7 +169,7 @@ export default function ShopPage() {
         </button>
       </div>
 
-      {/* ── Hero ──────────────────────────────────── */}
+      {/* ── Hero ────────────────────────────────────────────── */}
       <section style={{
         padding: 'clamp(3.5rem, 8vw, 7rem) clamp(1rem, 4vw, 2.5rem)',
         maxWidth: '860px', margin: '0 auto', textAlign: 'center',
@@ -208,7 +208,7 @@ export default function ShopPage() {
         </div>
       </section>
 
-      {/* ── Category filter bar ──────────────────────── */}
+      {/* ── Category filter bar ─────────────────────────────── */}
       <div style={{
         borderTop: '1px solid rgba(255,255,255,0.06)',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -240,7 +240,7 @@ export default function ShopPage() {
         </div>
       </div>
 
-      {/* ── Product grid ──────────────────────────────── */}
+      {/* ── Product grid ────────────────────────────────────── */}
       <div style={{
         maxWidth: '1280px', margin: '0 auto',
         padding: 'var(--space-12) clamp(1rem, 4vw, 2.5rem)',
@@ -272,7 +272,7 @@ export default function ShopPage() {
         </div>
       </div>
 
-      {/* ── Cart drawer ────────────────────────────── */}
+      {/* ── Cart drawer ─────────────────────────────────────── */}
       <CartDrawer
         cart={cart} open={cartOpen}
         onClose={() => setCartOpen(false)}
@@ -281,7 +281,7 @@ export default function ShopPage() {
         onCheckout={() => { setCartOpen(false); setCheckout(true); }}
       />
 
-      {/* ── Checkout modal ────────────────────────── */}
+      {/* ── Checkout modal ──────────────────────────────────── */}
       {checkoutOpen && !ordered && (
         <CheckoutModal
           form={form} setForm={setForm}
@@ -294,7 +294,7 @@ export default function ShopPage() {
         />
       )}
 
-      {/* ── Order success ─────────────────────────── */}
+      {/* ── Order success ───────────────────────────────────── */}
       {ordered && (
         <OrderSuccess
           onClose={() => {
@@ -309,7 +309,7 @@ export default function ShopPage() {
   );
 }
 
-/* ─── ProductCard ───────────────────────────────────────────── */
+/* ─── ProductCard ──────────────────────────────────────────────────────────── */
 
 function ProductCard({ product: p, onAdd }: { product: Product; onAdd: (p: Product) => void }) {
   const [added, setAdded]         = useState(false);
@@ -438,7 +438,7 @@ function ProductIconFallback({ category, hue }: { category: string; hue: string 
   );
 }
 
-/* ─── CartDrawer ────────────────────────────────────────────── */
+/* ─── CartDrawer ───────────────────────────────────────────────────────────── */
 
 function CartDrawer({ cart, open, onClose, onUpdateQty, total, onCheckout }: {
   cart: CartItem[]; open: boolean; onClose: () => void;
@@ -545,7 +545,7 @@ function CartDrawer({ cart, open, onClose, onUpdateQty, total, onCheckout }: {
   );
 }
 
-/* ─── CheckoutModal ────────────────────────────────────────── */
+/* ─── CheckoutModal ────────────────────────────────────────────────────────── */
 
 function CheckoutModal({ form, setForm, total, cart, isFormValid, placing, onClose, onPlace, error }: {
   form: CheckoutForm;
@@ -666,7 +666,7 @@ function CheckoutModal({ form, setForm, total, cart, isFormValid, placing, onClo
   );
 }
 
-/* ─── OrderSuccess ─────────────────────────────────────────── */
+/* ─── OrderSuccess ─────────────────────────────────────────────────────────── */
 
 function OrderSuccess({ onClose }: { onClose: () => void }) {
   return (

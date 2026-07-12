@@ -29,12 +29,12 @@ async function get<T>(path: string): Promise<T | null> {
   }
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────
    TRANSFORMS
    Backend returns snake_case field names that differ from our
    frontend TypeScript types. These functions normalise the shape
    so components always receive the type they expect.
-────────────────────────────────────────────────────────────── */
+───────────────────────────────────────────────────────────── */
 
 function transformNewsResponse(raw: Record<string, unknown>): NewsResponse | null {
   if (!Array.isArray(raw?.articles)) return null;
@@ -72,9 +72,9 @@ function transformSocialResponse(raw: Record<string, unknown>): SocialResponse |
   };
 }
 
-/* ───────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────
    API CALLS
-────────────────────────────────────────────────────────────── */
+───────────────────────────────────────────────────────────── */
 
 export const api = {
   /* Documentary — field names match backend directly */
@@ -134,10 +134,10 @@ export const api = {
   },
 };
 
-/* ───────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────
    KASHMIR HARVEST CMS helpers
    JWT stored in localStorage, passed as Bearer token.
-────────────────────────────────────────────────────────────── */
+───────────────────────────────────────────────────────────── */
 
 export function getCmsToken(): string | null {
   if (typeof window === 'undefined') return null;

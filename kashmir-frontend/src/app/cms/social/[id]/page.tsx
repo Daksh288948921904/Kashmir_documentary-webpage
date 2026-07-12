@@ -110,7 +110,6 @@ export default function EditSocialPostPage({ params }: { params: Promise<{ id: s
       <h1 style={{ margin: '0 0 28px', fontSize: '1.3rem', fontFamily: 'Playfair Display, serif', fontWeight: 400, color: '#e8e4dc' }}>Edit Post</h1>
       <form onSubmit={handleSave} style={{ maxWidth: '600px' }}>
 
-        {/* Platforms */}
         <div style={FIELD}>
           <span style={LABEL}>Publish to</span>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -158,11 +157,9 @@ export default function EditSocialPostPage({ params }: { params: Promise<{ id: s
           <button type="button" onClick={() => router.push('/cms/social')} style={{ padding: '10px 24px', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#666', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
         </div>
 
-        {/* Publish section */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '24px' }}>
           <div style={{ fontFamily: 'Space Mono, monospace', fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#555', marginBottom: '16px' }}>Publish</div>
 
-          {/* Per-platform status */}
           {Object.keys(publishResult).length > 0 && (
             <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {Object.entries(publishResult).map(([plat, ps]) => (
