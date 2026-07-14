@@ -57,6 +57,8 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
 
   const checksum = sha256(`${sKey}@${buyerData}`);
 
+  const callbackUrl = `${s.frontendUrl}/api/payment/callback`;
+
   const formFields: Record<string, string> = {
     mercid:         merchantId,
     orderid:        txnId,
@@ -76,6 +78,7 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
     privatekey:     privateKey,
     checksum,
     txnsubtype:     '',
+    redirecturl:    callbackUrl,
   };
 
   return {
