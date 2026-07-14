@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode, RefObject } from 'react';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useTimestamps } from '@/hooks/useTimestamps';
@@ -13,21 +12,6 @@ import { api } from '@/lib/api';
 import type { UserTimestamp, TimestampMarker } from '@/types/api';
 
 gsap.registerPlugin(ScrollTrigger);
-
-/* ── ReactPlayer — lazy, no SSR (v3 uses 'react-player', not 'react-player/lazy') ── */
-const ReactPlayer = dynamic(() => import('react-player'), {
-  ssr: false,
-  loading: () => (
-    <div style={{
-      width: '100%', height: '100%',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
-      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-sm)', color: 'var(--color-ash-text)' }}>
-        Loading player…
-      </span>
-    </div>
-  ),
-});
 
 /* ── Constants ── */
 const STORAGE_KEY = 'kashmir_user_timestamps';
@@ -308,6 +292,11 @@ export default function Watch() {
   const filmAvailable = CONFIG.features.filmAvailable;
   const filmUrl       = CONFIG.media.filmUrl;
 
+  /* Rig360 screening session */
+  type ScreeningSession = { playbackUrl: string; keyToken: string; expiresIn: number };
+  const [session, setSession] = useState<ScreeningSession | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   /* Load user timestamps from localStorage */
   useEffect(() => {
     setUserTimestamps(loadUserTimestamps());
@@ -351,6 +340,53 @@ export default function Watch() {
       setAccess('gate');
     });
   }, [filmAvailable]);
+
+  /* Fetch Rig360 screening session once access is granted */
+  useEffect(() => {
+    if (access !== 'granted') return;
+    const token = localStorage.getItem(JWT_KEY);
+    // Dev bypass: no token available — skip session fetch, fall back to filmUrl
+    if (!token) return;
+    fetch('/api/screening/session', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then((s: ScreeningSession | null) => { if (s?.playbackUrl) setSession(s); })
+      .catch(() => null);
+  }, [access]);
+
+  /* Dev bypass: fetch a dev screening session (includes keyToken for decryption) */
+  useEffect(() => {
+    if (!CONFIG.payment.devBypass || session) return;
+    fetch('/api/screening/dev-session')
+      .then(r => r.ok ? r.json() : null)
+      .then((s: ScreeningSession | null) => { if (s?.playbackUrl) setSession(s); })
+      .catch(() => null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* Mount hls.js when session is ready */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !session) return;
+    let hls: import('hls.js').default | null = null;
+    import('hls.js').then(({ default: Hls }) => {
+      if (!Hls.isSupported()) {
+        video.src = session.playbackUrl;
+        return;
+      }
+      hls = new Hls({
+        xhrSetup: (xhr: XMLHttpRequest, url: string) => {
+          if (url.includes('/key')) {
+            xhr.setRequestHeader('Authorization', `Bearer ${session.keyToken}`);
+          }
+        },
+      });
+      hls.loadSource(session.playbackUrl);
+      hls.attachMedia(video);
+    });
+    return () => { hls?.destroy(); };
+  }, [session]);
 
   /* Airpay payment flow — creates order then submits a hidden form to Airpay */
   const handleWatch = async () => {
@@ -481,21 +517,18 @@ export default function Watch() {
                   border: 'var(--border-dim)', marginBottom: 'var(--space-6)',
                 }}>
                   <div style={{ aspectRatio: '16/9', backgroundColor: '#000', position: 'relative' }}>
-                    {filmUrl ? (
-                      <ReactPlayer
-                        src={filmUrl}
+                    {(session || (CONFIG.payment.devBypass && filmUrl)) ? (
+                      <video
+                        ref={videoRef}
                         controls
-                        playing={false}
-                        onTimeUpdate={(e: React.SyntheticEvent<HTMLVideoElement>) => {
-                          setCurrentTime(Math.floor(e.currentTarget.currentTime));
-                        }}
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+                        playsInline
+                        onTimeUpdate={e => setCurrentTime(Math.floor(e.currentTarget.currentTime))}
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: '#000' }}
                       />
                     ) : (
                       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-sm)', color: 'var(--color-ash-text)', textAlign: 'center', padding: 'var(--space-6)' }}>
-                          Access granted — film URL not yet configured.<br />
-                          <span style={{ fontSize: 'var(--text-xs)', opacity: 0.6 }}>Set NEXT_PUBLIC_FILM_URL in .env.local</span>
+                          Preparing your screening…
                         </p>
                       </div>
                     )}

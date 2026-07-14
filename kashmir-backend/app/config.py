@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     brevo_from_email: str = "harvest@kashmirharvest.in"
     brevo_admin_email: str = ""
 
+    # Rig360 screening system
+    screening_partner_key: str = ""
+
     # Ayrshare (social media publishing)
     ayrshare_api_key: str = ""
 

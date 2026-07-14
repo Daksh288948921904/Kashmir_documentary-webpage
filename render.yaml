@@ -1,0 +1,175 @@
+services:
+
+  # ── FastAPI Backend ──────────────────────────────────────────────────────────
+  - type: web
+    name: kashmir-backend
+    runtime: python
+    rootDir: kashmir-backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: "3.11"
+
+      # Set this after frontend deploys (or use your custom domain)
+      - key: FRONTEND_URL
+        sync: false          # e.g. https://kashmirharvest.in
+
+      # Supabase
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+      # JWT
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+
+      # Documentary price
+      - key: DOCUMENTARY_PRICE_INR
+        value: "1"
+
+      # CMS auth
+      - key: CMS_PASSWORD
+        sync: false
+      - key: CMS_JWT_SECRET
+        sync: false
+
+      # Airpay (backend also validates callbacks as fallback)
+      - key: AIRPAY_MERCHANT_ID
+        sync: false
+      - key: AIRPAY_USERNAME
+        sync: false
+      - key: AIRPAY_PASSWORD
+        sync: false
+      - key: AIRPAY_API_KEY
+        sync: false
+      - key: AIRPAY_CLIENT_ID
+        sync: false
+      - key: AIRPAY_SECRET_KEY
+        sync: false
+      - key: AIRPAY_IS_TEST
+        value: "false"
+      - key: AIRPAY_BASE_URL
+        value: https://payments.airpay.co.in/pay/index.php
+
+      # Rig360 screening
+      - key: SCREENING_PARTNER_KEY
+        sync: false
+
+      # Ayrshare (social publishing)
+      - key: AYRSHARE_API_KEY
+        sync: false
+
+      # X / Twitter BYOK
+      - key: X_API_KEY
+        sync: false
+      - key: X_API_SECRET
+        sync: false
+      - key: X_ACCESS_TOKEN
+        sync: false
+      - key: X_ACCESS_TOKEN_SECRET
+        sync: false
+
+      # Brevo (email)
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_FROM_EMAIL
+        sync: false
+      - key: BREVO_ADMIN_EMAIL
+        sync: false
+
+
+  # ── Next.js Frontend ─────────────────────────────────────────────────────────
+  - type: web
+    name: kashmir-frontend
+    runtime: node
+    rootDir: kashmir-frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+
+      # Backend URL — both vars must point to the kashmir-backend service URL
+      - key: BACKEND_URL
+        fromService:
+          name: kashmir-backend
+          type: web
+          property: url
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          name: kashmir-backend
+          type: web
+          property: url
+
+      # Site URL — set to your custom domain once DNS is pointed, or leave as onrender.com URL
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false          # e.g. https://kashmirharvest.in
+
+      # Film
+      - key: NEXT_PUBLIC_FILM_URL
+        value: https://screening.rig360media.com/video/master.m3u8
+
+      # Dev bypass OFF in production
+      - key: NEXT_PUBLIC_DEV_BYPASS_PAYMENT
+        value: "false"
+
+      # Supabase (frontend CMS routes call Supabase directly)
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+      # JWT (frontend issues and verifies access tokens)
+      - key: JWT_SECRET
+        sync: false
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+
+      # Documentary price
+      - key: DOCUMENTARY_PRICE_INR
+        value: "1"
+
+      # CMS auth
+      - key: CMS_PASSWORD
+        sync: false
+      - key: CMS_JWT_SECRET
+        sync: false
+
+      # Airpay (frontend handles payment directly)
+      - key: AIRPAY_MERCHANT_ID
+        sync: false
+      - key: AIRPAY_USERNAME
+        sync: false
+      - key: AIRPAY_PASSWORD
+        sync: false
+      - key: AIRPAY_API_KEY
+        sync: false
+      - key: AIRPAY_CLIENT_ID
+        sync: false
+      - key: AIRPAY_SECRET_KEY
+        sync: false
+      - key: AIRPAY_BASE_URL
+        value: https://payments.airpay.co.in/pay/index.php
+
+      # Brevo (frontend uses Brevo for order emails via backend proxy)
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_FROM_EMAIL
+        sync: false
+      - key: BREVO_ADMIN_EMAIL
+        sync: false
+
+      # Apify (social content scraping — optional)
+      - key: APIFY_API_TOKEN
+        sync: false

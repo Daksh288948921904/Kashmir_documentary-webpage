@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.routers import documentary, social, news, payment
-from app.routers import cms_auth, products, orders, upload, social_cms
+from app.routers import cms_auth, products, orders, upload, social_cms, screening
 
 settings = get_settings()
 app = FastAPI(
@@ -29,6 +29,7 @@ app.include_router(products.router, prefix="/api")
 app.include_router(orders.router, prefix="/api")
 app.include_router(upload.router, prefix="/api")
 app.include_router(social_cms.router, prefix="/api")
+app.include_router(screening.router, prefix="/api")
 
 @app.get("/")
 async def root():
