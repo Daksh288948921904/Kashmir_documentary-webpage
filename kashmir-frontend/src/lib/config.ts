@@ -125,7 +125,8 @@ export const CONFIG = {
       'A documentary about ordinary people living in extraordinary circumstances. Kashmir — Fighting for Peace by Rig 360 Media.',
     // REQUIRED BEFORE DEPLOYMENT: add your own /public/og-image.jpg and set NEXT_PUBLIC_OG_IMAGE_URL=https://yourdomain.com/og-image.jpg
     // Without a self-hosted image, broken Pexels URLs will break every social share preview.
-    ogImage: process.env.NEXT_PUBLIC_OG_IMAGE_URL ?? 'https://images.pexels.com/photos/14651212/pexels-photo-14651212.jpeg?auto=compress&cs=tinysrgb&w=1200&q=80',
+    ogImage: process.env.NEXT_PUBLIC_OG_IMAGE_URL
+      ?? `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/og-image.jpg`,
   },
 } as const;
 
