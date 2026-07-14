@@ -48,8 +48,9 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
   const privateKey = sha256(`${apiKey}@${username}:|:${password}`);
   const sKey       = sha256(`${username}~:~${password}`);
 
+  // Airpay checksum: email~:~fname~:~lname~:~addr~:~city~:~state~:~country~:~amount~:~orderid~:~currency~:~isdefault~:~isocurrency~:~txnsubtype~:~phone~:~pincode
   const buyerData = [
-    input.email, input.name, input.name, '',
+    input.email, input.name, input.name,
     input.address ?? '', input.city ?? '', input.state ?? '',
     input.country ?? 'India', amount, txnId, currency, '0', 'INR', '0',
     input.phone, input.pin_code ?? '',
