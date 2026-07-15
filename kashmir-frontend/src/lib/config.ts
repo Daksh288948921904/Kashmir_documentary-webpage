@@ -89,8 +89,8 @@ export const CONFIG = {
   /* ── Effects Flags ───────────────────── */
   effects: {
     grainEnabled: true,
-    cursorEnabled: true,
-    cursorLightEnabled: true,
+    cursorEnabled: false,
+    cursorLightEnabled: false,
     smoothScrollEnabled: true,
     /* Future WebGL upgrade — each is a swap point */
     webglHeroEnabled: false,

@@ -23,10 +23,6 @@ html {
   scroll-behavior: auto;
 }
 
-/* Custom cursor only on true pointer devices — not on touch/hybrid screens */
-@media (hover: hover) and (pointer: fine) {
-  html { cursor: none; }
-}
 
 body {
   background-color: var(--color-deep-slate);
@@ -240,7 +236,7 @@ a {
   text-transform: uppercase;
   padding: 0.85rem 2rem;
   border-radius: var(--radius-sm);
-  cursor: none;
+  cursor: pointer;
   transition:
     background-color var(--duration-fast) var(--ease-decisive),
     box-shadow var(--duration-base) var(--ease-settle),
