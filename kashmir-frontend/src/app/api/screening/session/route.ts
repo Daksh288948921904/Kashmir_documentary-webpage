@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { jwtVerify } from 'jose';
+import { getServerSettings } from '@/server/config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const BACKEND = process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+const RIG360_URL = 'https://screening.rig360media.com/api/partner/session';
 
 export async function GET(request: Request) {
   const auth = request.headers.get('authorization') ?? '';
@@ -11,10 +13,31 @@ export async function GET(request: Request) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
 
-  const upstream = await fetch(`${BACKEND}/api/screening/session`, {
-    headers: { authorization: auth },
+  const s = getServerSettings();
+  const token = auth.slice(7);
+
+  // Verify the payment JWT
+  let userRef = 'viewer';
+  let email   = 'viewer@kashmirharvest.in';
+  try {
+    const key = new TextEncoder().encode(s.jwtSecret);
+    const { payload } = await jwtVerify(token, key, { algorithms: ['HS256'] });
+    userRef = String(payload.sub ?? payload.order_id ?? 'viewer');
+    email   = String(payload.email ?? 'viewer@kashmirharvest.in');
+  } catch {
+    return NextResponse.json({ detail: 'Invalid access token' }, { status: 401 });
+  }
+
+  if (!s.screeningPartnerKey) {
+    return NextResponse.json({ detail: 'Screening not configured' }, { status: 503 });
+  }
+
+  const r = await fetch(RIG360_URL, {
+    method: 'POST',
+    headers: { 'X-Partner-Key': s.screeningPartnerKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userRef, email, ttl: 21600 }),
   });
 
-  const data = await upstream.json();
-  return NextResponse.json(data, { status: upstream.status });
+  const data = await r.json();
+  return NextResponse.json(data, { status: r.status });
 }
