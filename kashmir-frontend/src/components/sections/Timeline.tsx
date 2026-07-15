@@ -2,150 +2,189 @@
 
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useTimeline } from '@/hooks/useTimeline';
-import type { TimelineEvent } from '@/types/api';
+import type { TimelineEvent, TimelineDoc } from '@/types/api';
 
-/* ── Eras ─────────────────────────────────────────────────────────────── */
+/* ─── Historical eras ──────────────────────────────────────────────────── */
 const ERAS = [
   {
     id: 'medieval',
+    num: '01',
     name: 'Before the Wound',
     range: '1339 – 1845',
-    tagline: 'Kingdoms, Mughals, and Sikhs — centuries before the map was drawn in blood.',
+    tagline: 'Sultanates, Mughals, Afghans, and Sikhs — five centuries in which this valley belonged to itself.',
     from: 1339, to: 1845,
-    color: '#4A7B8C',
-    bg: 'rgba(74,123,140,0.06)',
+    accent: '#3A9CB5',
   },
   {
     id: 'colonial',
+    num: '02',
     name: 'Sold, Not Heard',
     range: '1846 – 1946',
-    tagline: 'The British sell a people for 75 lakh rupees. A century of Dogra rule follows.',
+    tagline: 'The British sell an entire people to a Dogra maharaja for ₹75 lakh. No Kashmiri is present at the table.',
     from: 1846, to: 1946,
-    color: '#8B6914',
-    bg: 'rgba(139,105,20,0.07)',
+    accent: '#C9901A',
   },
   {
     id: 'partition',
+    num: '03',
     name: 'The Unfinished Partition',
     range: '1947 – 1988',
-    tagline: 'Independence divides a subcontinent — but not this question. Three wars. One unresolved border.',
+    tagline: 'Independence divides a subcontinent — but not this question. Three wars. A UN resolution. No plebiscite.',
     from: 1947, to: 1988,
-    color: '#8B2F3F',
-    bg: 'rgba(139,47,63,0.08)',
+    accent: '#C03050',
   },
   {
-    id: 'insurgency',
+    id: 'fire',
+    num: '04',
     name: 'Fire Season',
     range: '1989 – 2018',
-    tagline: 'Armed insurgency erupts. An estimated 70,000 dead. 250,000 Pandits displaced. Three decades of fire.',
+    tagline: 'Armed insurgency. 250,000 Pandits displaced. An estimated 70,000 dead. Three decades of fire.',
     from: 1989, to: 2018,
-    color: '#B85C38',
-    bg: 'rgba(184,92,56,0.07)',
+    accent: '#D4622A',
   },
   {
     id: 'present',
+    num: '05',
     name: 'The New Reality',
     range: '2019 – Present',
-    tagline: 'Article 370 revoked. Statehood dissolved. Operation Sindoor. The question remains open.',
+    tagline: 'Article 370 revoked. Statehood dissolved. Operation Sindoor. The wound remains open.',
     from: 2019, to: 9999,
-    color: '#7B5EA7',
-    bg: 'rgba(123,94,167,0.07)',
+    accent: '#7C5EC8',
   },
-];
+] as const;
 
-const CATEGORY_COLORS: Record<string, string> = {
-  political:    '#C97B2B',
-  conflict:     '#8B2F3F',
-  cultural:     '#4A7B8C',
-  humanitarian: '#5A7B5A',
-};
+type EraId = typeof ERAS[number]['id'];
 
-const CATEGORY_LABELS: Record<string, string> = {
-  political: 'Political', conflict: 'Conflict',
-  cultural: 'Cultural', humanitarian: 'Humanitarian',
+const CAT: Record<string, { color: string; label: string }> = {
+  political:    { color: '#C9901A', label: 'Political' },
+  conflict:     { color: '#C03050', label: 'Conflict' },
+  cultural:     { color: '#3A9CB5', label: 'Cultural' },
+  humanitarian: { color: '#3D9A3D', label: 'Humanitarian' },
 };
 
 type Filter = 'all' | 'political' | 'conflict' | 'cultural' | 'humanitarian';
 
-/* ── Source Document Panel ─────────────────────────────────────────────── */
-function SourcePanel({ doc, onClose }: { doc: TimelineEvent['doc']; onClose: () => void }) {
-  if (!doc) return null;
+/* ─── Primary source document ──────────────────────────────────────────── */
+function DocPanel({ doc, onClose }: { doc: TimelineDoc; onClose: () => void }) {
   return (
     <div style={{
-      marginTop: '1rem',
-      padding: '1rem 1.25rem',
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(201,123,43,0.25)',
-      borderRadius: '6px',
-      position: 'relative',
+      marginTop: '1.25rem',
+      background: 'rgba(201,144,26,0.05)',
+      border: '1px solid rgba(201,144,26,0.22)',
+      borderRadius: '8px',
+      overflow: 'hidden',
     }}>
-      <button
-        onClick={onClose}
-        aria-label="Close source"
-        style={{
-          position: 'absolute', top: '0.75rem', right: '0.75rem',
-          background: 'none', border: 'none', color: 'var(--color-ash-text)',
-          fontSize: '1rem', cursor: 'pointer', lineHeight: 1,
-        }}
-      >×</button>
+      {/* Doc header bar */}
       <div style={{
-        fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-        letterSpacing: '0.18em', textTransform: 'uppercase',
-        color: '#C97B2B', marginBottom: '0.35rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0.65rem 1rem',
+        background: 'rgba(201,144,26,0.08)',
+        borderBottom: '1px solid rgba(201,144,26,0.15)',
       }}>
-        Primary Source · {doc.kind}
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.58rem',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          color: '#C9901A',
+        }}>
+          Primary Source · {doc.kind}
+        </div>
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          style={{
+            background: 'none', border: 'none',
+            color: 'rgba(255,255,255,0.35)', fontSize: '1rem',
+            cursor: 'pointer', lineHeight: 1, padding: '0 0 0 0.75rem',
+          }}
+        >×</button>
       </div>
-      <div style={{
-        fontFamily: 'var(--font-display)', fontSize: '1rem',
-        color: 'var(--color-snow)', marginBottom: '0.5rem',
-      }}>
-        {doc.name}
+
+      <div style={{ padding: '1rem 1.25rem 1.25rem' }}>
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1rem',
+          color: 'var(--color-snow)',
+          lineHeight: 1.3,
+          marginBottom: '0.3rem',
+        }}>
+          {doc.name}
+        </div>
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.62rem',
+          letterSpacing: '0.07em',
+          color: 'var(--color-ash-text)',
+          marginBottom: '0.875rem',
+        }}>
+          {doc.date} · {doc.source}
+        </div>
+        <p style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: '0.875rem',
+          color: 'var(--color-snow-dim)',
+          lineHeight: 1.72,
+          margin: '0 0 1rem',
+        }}>
+          {doc.desc}
+        </p>
+        <a
+          href={doc.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.62rem',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: '#C9901A',
+            textDecoration: 'none',
+            borderBottom: '1px solid rgba(201,144,26,0.35)',
+            paddingBottom: '1px',
+            cursor: 'pointer',
+          }}
+        >
+          Read full document →
+        </a>
       </div>
-      <div style={{
-        fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
-        color: 'var(--color-ash-text)', marginBottom: '0.75rem',
-      }}>
-        {doc.date} · {doc.source}
-      </div>
-      <p style={{
-        fontFamily: 'var(--font-body)', fontSize: '0.875rem',
-        color: 'var(--color-snow-dim)', lineHeight: 1.65,
-        marginBottom: '0.75rem',
-      }}>
-        {doc.desc}
-      </p>
-      <a
-        href={doc.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-          letterSpacing: '0.12em', textTransform: 'uppercase',
-          color: '#C97B2B', textDecoration: 'none',
-          borderBottom: '1px solid rgba(201,123,43,0.4)',
-          paddingBottom: '1px',
-        }}
-      >
-        Read full document →
-      </a>
     </div>
   );
 }
 
-/* ── Event Card ────────────────────────────────────────────────────────── */
-function EventCard({ event, eraColor }: { event: TimelineEvent; eraColor: string }) {
+/* ─── Single event card ─────────────────────────────────────────────────── */
+function EventCard({
+  event,
+  accent,
+  isLast,
+}: {
+  event: TimelineEvent;
+  accent: string;
+  isLast: boolean;
+}) {
+  const [showDoc, setShowDoc] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [showSource, setShowSource] = useState(false);
-  const catColor = CATEGORY_COLORS[event.category] ?? eraColor;
   const ref = useRef<HTMLDivElement>(null);
+  const cat = CAT[event.category] ?? { color: accent, label: event.category };
+  const isLong = event.description.length > 280;
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; } },
-      { threshold: 0.12 },
-    );
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(22px)';
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+        obs.disconnect();
+      }
+    }, { threshold: 0.08 });
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
@@ -154,147 +193,301 @@ function EventCard({ event, eraColor }: { event: TimelineEvent; eraColor: string
     <div
       ref={ref}
       style={{
-        opacity: 0, transform: 'translateY(24px)',
-        transition: 'opacity 0.5s ease, transform 0.5s ease',
-        display: 'grid', gridTemplateColumns: '72px 1fr',
-        gap: '0 1.25rem', paddingBottom: '2rem',
+        display: 'grid',
+        gridTemplateColumns: '68px 1fr',
+        gap: '0 1.25rem',
+        transition: 'opacity 0.5s ease, transform 0.55s ease',
+        paddingBottom: isLast ? 0 : '1.75rem',
       }}
     >
-      {/* Year + spine */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '2px' }}>
+      {/* Year column */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{
-          fontFamily: 'var(--font-mono)', fontSize: '0.8rem',
-          fontWeight: 700, color: eraColor, letterSpacing: '0.05em',
-          marginBottom: '0.5rem', textAlign: 'center',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.78rem',
+          fontWeight: 700,
+          color: accent,
+          letterSpacing: '0.03em',
+          textAlign: 'center',
+          marginBottom: '0.5rem',
+          paddingTop: '0.85rem',
+          lineHeight: 1,
         }}>
           {event.year}
         </div>
-        <div style={{ width: '1px', flexGrow: 1, background: `${eraColor}30` }} />
+        {!isLast && (
+          <div style={{
+            width: '1px',
+            flexGrow: 1,
+            minHeight: '20px',
+            background: `linear-gradient(to bottom, ${accent}45 0%, ${accent}08 100%)`,
+          }} />
+        )}
       </div>
 
       {/* Card */}
       <div style={{
-        background: 'rgba(255,255,255,0.025)',
-        border: `1px solid rgba(255,255,255,0.07)`,
-        borderLeft: `3px solid ${catColor}`,
+        background: 'rgba(255,255,255,0.022)',
+        border: '1px solid rgba(255,255,255,0.065)',
+        borderLeft: `3px solid ${cat.color}`,
         borderRadius: '8px',
-        padding: '1rem 1.25rem',
-        cursor: 'pointer',
+        padding: '0.9rem 1.1rem',
         transition: 'background 0.2s',
+        cursor: 'default',
       }}
-        onClick={() => setExpanded(e => !e)}
-        onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.04)'; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.025)'; }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.038)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.022)'; }}
       >
-        {/* Header row */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '0.5rem' }}>
-          <div style={{
-            fontFamily: 'var(--font-body)', fontWeight: 600,
-            fontSize: 'clamp(0.95rem, 1.5vw, 1.05rem)',
-            color: 'var(--color-snow)', lineHeight: 1.3,
+        {/* Title row */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: '0.75rem',
+          marginBottom: '0.35rem',
+        }}>
+          <h3 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(0.95rem, 1.6vw, 1.05rem)',
+            color: 'var(--color-snow)',
+            fontWeight: 500,
+            lineHeight: 1.25,
+            margin: 0,
           }}>
             {event.title}
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
-            letterSpacing: '0.15em', textTransform: 'uppercase',
-            color: catColor, whiteSpace: 'nowrap', flexShrink: 0,
-            border: `1px solid ${catColor}40`, borderRadius: '3px',
-            padding: '2px 6px', marginTop: '2px',
+          </h3>
+          <span style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.55rem',
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: cat.color,
+            border: `1px solid ${cat.color}38`,
+            borderRadius: '3px',
+            padding: '2px 6px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            marginTop: '2px',
           }}>
-            {CATEGORY_LABELS[event.category]}
-          </div>
+            {cat.label}
+          </span>
         </div>
 
-        {/* Location */}
+        {/* Place */}
         {event.place && (
           <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-            letterSpacing: '0.12em', color: 'var(--color-ash-text)',
-            marginBottom: '0.6rem',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.6rem',
+            letterSpacing: '0.1em',
+            color: 'rgba(255,255,255,0.3)',
+            marginBottom: '0.65rem',
           }}>
-            📍 {event.place}
+            ◦ {event.place}
           </div>
         )}
 
-        {/* Description — always show, expand for full */}
+        {/* Description */}
         <p style={{
-          fontFamily: 'var(--font-body)', fontSize: '0.9rem',
-          color: 'var(--color-snow-dim)', lineHeight: 1.7,
-          margin: 0,
+          fontFamily: 'var(--font-body)',
+          fontSize: '0.9rem',
+          color: 'var(--color-snow-dim)',
+          lineHeight: 1.72,
+          margin: '0 0 0.75rem',
+          overflow: 'hidden',
           display: '-webkit-box',
-          WebkitLineClamp: expanded ? 'unset' : 3,
           WebkitBoxOrient: 'vertical' as const,
-          overflow: expanded ? 'visible' : 'hidden',
+          WebkitLineClamp: expanded || !isLong ? 'unset' : 3,
         }}>
           {event.description}
         </p>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', alignItems: 'center' }}>
-          <button
-            onClick={e => { e.stopPropagation(); setExpanded(v => !v); }}
-            style={{
-              background: 'none', border: 'none', padding: 0,
-              fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-              letterSpacing: '0.12em', textTransform: 'uppercase',
-              color: 'var(--color-ash-text)', cursor: 'pointer',
-            }}
-          >
-            {expanded ? '↑ Less' : '↓ Read more'}
-          </button>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          {isLong && (
+            <button
+              onClick={() => setExpanded(v => !v)}
+              style={{
+                background: 'none', border: 'none', padding: 0,
+                fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.3)', cursor: 'pointer',
+                transition: 'color 0.15s',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.3)'; }}
+            >
+              {expanded ? '↑ Less' : '↓ Read more'}
+            </button>
+          )}
 
           {event.doc && (
             <button
-              onClick={e => { e.stopPropagation(); setExpanded(true); setShowSource(v => !v); }}
+              onClick={() => { setExpanded(true); setShowDoc(v => !v); }}
               style={{
                 background: 'none', border: 'none', padding: 0,
-                fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+                fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
                 letterSpacing: '0.12em', textTransform: 'uppercase',
-                color: '#C97B2B', cursor: 'pointer',
-                textDecoration: showSource ? 'underline' : 'none',
+                color: showDoc ? '#C9901A' : 'rgba(201,144,26,0.55)',
+                cursor: 'pointer', transition: 'color 0.15s',
               }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#C9901A'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = showDoc ? '#C9901A' : 'rgba(201,144,26,0.55)'; }}
             >
-              📄 Primary Source
+              📄 {showDoc ? 'Hide source' : 'Primary source'}
             </button>
           )}
         </div>
 
-        {showSource && event.doc && (
-          <SourcePanel doc={event.doc} onClose={() => setShowSource(false)} />
+        {showDoc && event.doc && (
+          <DocPanel doc={event.doc} onClose={() => setShowDoc(false)} />
         )}
       </div>
     </div>
   );
 }
 
-/* ── Main Component ────────────────────────────────────────────────────── */
+/* ─── Era chapter header ────────────────────────────────────────────────── */
+function EraHeader({ era, count }: { era: typeof ERAS[number]; count: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-12px)';
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        el.style.opacity = '1';
+        el.style.transform = 'translateX(0)';
+        obs.disconnect();
+      }
+    }, { threshold: 0.15 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        marginBottom: '2rem',
+        transition: 'opacity 0.6s ease, transform 0.6s ease',
+      }}
+    >
+      {/* Number + accent line */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        marginBottom: '1rem',
+      }}>
+        <span style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'clamp(3rem, 6vw, 5rem)',
+          color: `${era.accent}18`,
+          lineHeight: 1,
+          fontWeight: 700,
+          letterSpacing: '-0.02em',
+          userSelect: 'none',
+        }}>
+          {era.num}
+        </span>
+        <div style={{
+          height: '1px',
+          flexGrow: 1,
+          background: `linear-gradient(to right, ${era.accent}60, transparent)`,
+        }} />
+      </div>
+
+      <div style={{
+        padding: '1.25rem 1.5rem',
+        background: `${era.accent}08`,
+        border: `1px solid ${era.accent}1A`,
+        borderLeft: `4px solid ${era.accent}`,
+        borderRadius: '0 8px 8px 0',
+      }}>
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.6rem',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          color: era.accent,
+          marginBottom: '0.4rem',
+          opacity: 0.85,
+        }}>
+          {era.range} · {count} event{count !== 1 ? 's' : ''}
+        </div>
+        <h2 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'clamp(1.4rem, 3vw, 2rem)',
+          color: 'var(--color-snow)',
+          fontWeight: 400,
+          lineHeight: 1.1,
+          margin: '0 0 0.5rem',
+        }}>
+          {era.name}
+        </h2>
+        <p style={{
+          fontFamily: 'var(--font-display)',
+          fontStyle: 'italic',
+          fontSize: 'clamp(0.875rem, 1.4vw, 0.975rem)',
+          color: 'rgba(255,255,255,0.45)',
+          lineHeight: 1.6,
+          margin: 0,
+        }}>
+          {era.tagline}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main component ────────────────────────────────────────────────────── */
 export default function Timeline() {
   const { events } = useTimeline();
-  const [filter, setFilter] = useState<Filter>('all');
-  const [search, setSearch] = useState('');
-  const [activeEra, setActiveEra] = useState<string | null>(null);
-  const eraRefs = useRef<Record<string, HTMLElement | null>>({});
-  const sectionRef = useRef<HTMLElement>(null);
+  const [filter, setFilter]   = useState<Filter>('all');
+  const [search, setSearch]   = useState('');
+  const [activeEra, setActiveEra] = useState<EraId>('medieval');
+  const eraRefs = useRef<Partial<Record<EraId, HTMLElement | null>>>({});
 
+  const allEvents = events as TimelineEvent[];
+  const docCount  = allEvents.filter(e => e.doc).length;
+
+  /* Filter + search */
   const filtered = useMemo(() => {
-    return (events as TimelineEvent[]).filter(e => {
-      const matchCat = filter === 'all' || e.category === filter;
-      const q = search.toLowerCase();
-      const matchSearch = !q || e.title.toLowerCase().includes(q) || e.description.toLowerCase().includes(q) || String(e.year).includes(q);
-      return matchCat && matchSearch;
+    const q = search.toLowerCase().trim();
+    return allEvents.filter(e => {
+      if (filter !== 'all' && e.category !== filter) return false;
+      if (!q) return true;
+      return (
+        e.title.toLowerCase().includes(q) ||
+        e.description.toLowerCase().includes(q) ||
+        String(e.year).includes(q) ||
+        (e.place ?? '').toLowerCase().includes(q)
+      );
     });
-  }, [events, filter, search]);
+  }, [allEvents, filter, search]);
+
+  /* Group by era */
+  const grouped = useMemo(() =>
+    ERAS.map(era => ({
+      era,
+      events: filtered.filter(e => e.year >= era.from && e.year <= era.to),
+    })),
+  [filtered]);
 
   /* Highlight active era on scroll */
   useEffect(() => {
     const obs = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
-          if (entry.isIntersecting) setActiveEra(entry.target.id);
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('data-era') as EraId;
+            if (id) setActiveEra(id);
+          }
         });
       },
-      { rootMargin: '-40% 0px -50% 0px' },
+      { rootMargin: '-25% 0px -65% 0px' },
     );
     ERAS.forEach(era => {
       const el = eraRefs.current[era.id];
@@ -303,274 +496,384 @@ export default function Timeline() {
     return () => obs.disconnect();
   }, []);
 
-  const scrollToEra = (id: string) => {
+  const scrollToEra = (id: EraId) => {
     eraRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
-
-  const eventsByEra = useMemo(() => {
-    return ERAS.map(era => ({
-      era,
-      events: filtered.filter(e => e.year >= era.from && e.year <= era.to),
-    }));
-  }, [filtered]);
-
-  const totalShown = filtered.length;
-  const hasSource = (events as TimelineEvent[]).filter(e => e.doc).length;
 
   return (
     <section
       id="history"
-      ref={sectionRef}
       style={{ position: 'relative', zIndex: 1, padding: 'var(--section-py) 0' }}
     >
       <div className="section-mist-top" />
       <div className="section-container">
 
-        {/* Header */}
-        <div style={{ maxWidth: '680px', marginBottom: 'clamp(2.5rem, 5vw, 4rem)' }}>
-          <span className="eyebrow">History</span>
+        {/* ── Section intro ── */}
+        <div style={{ maxWidth: '700px', marginBottom: 'clamp(2.5rem, 5vw, 4rem)' }}>
+          <span className="eyebrow">Research Archive</span>
           <h2 style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-            fontWeight: 400, color: 'var(--color-snow)',
-            lineHeight: 1.1, marginBottom: '1rem',
+            fontSize: 'clamp(2rem, 5.5vw, 3.75rem)',
+            fontWeight: 400,
+            color: 'var(--color-snow)',
+            lineHeight: 1.05,
+            marginBottom: '1.1rem',
           }}>
-            700 years of a people's story.
+            700 years.<br />One valley.<br />
+            <span style={{ color: 'rgba(255,255,255,0.35)' }}>No easy answer.</span>
           </h2>
           <p style={{
             fontFamily: 'var(--font-body)',
-            fontSize: 'clamp(0.95rem, 1.5vw, 1.1rem)',
-            color: 'var(--color-snow-dim)', lineHeight: 1.7,
-            marginBottom: '0.5rem',
+            fontSize: 'clamp(0.95rem, 1.5vw, 1.05rem)',
+            color: 'var(--color-snow-dim)',
+            lineHeight: 1.72,
+            margin: '0 0 1.5rem',
           }}>
-            An interactive research archive spanning the medieval sultanate to Operation Sindoor.
-            {hasSource > 0 && (
-              <> {hasSource} events link directly to primary source documents — treaties, UN resolutions, constitutional orders, court judgments.</>
+            An independent historical archive spanning the Shah Mir sultanate to Operation Sindoor.
+            {docCount > 0 && (
+              <> {docCount} events are linked to primary sources — treaties, UN resolutions, constitutional orders, and court judgments you can read in full.</>
             )}
           </p>
-        </div>
 
-        {/* Search + filters */}
-        <div style={{
-          display: 'flex', flexWrap: 'wrap', gap: '0.75rem',
-          marginBottom: '2.5rem', alignItems: 'center',
-        }}>
-          <input
-            type="search"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search events, years, places…"
-            style={{
-              flex: '1 1 240px', minWidth: '220px',
-              padding: '0.55rem 1rem',
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '6px',
-              fontFamily: 'var(--font-body)', fontSize: '0.9rem',
-              color: 'var(--color-snow)',
-              outline: 'none',
-            }}
-          />
-          <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-            {(['all', 'political', 'conflict', 'cultural', 'humanitarian'] as Filter[]).map(f => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                style={{
-                  fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-                  letterSpacing: '0.14em', textTransform: 'uppercase',
-                  padding: '0.4rem 0.8rem', borderRadius: '4px',
-                  border: `1px solid ${filter === f ? (CATEGORY_COLORS[f] ?? 'var(--color-saffron)') : 'rgba(255,255,255,0.12)'}`,
-                  background: filter === f ? `${CATEGORY_COLORS[f] ?? 'var(--color-saffron)'}18` : 'transparent',
-                  color: filter === f ? (CATEGORY_COLORS[f] ?? 'var(--color-saffron)') : 'var(--color-ash-text)',
-                  cursor: 'pointer', transition: 'all 0.15s',
-                }}
-              >
-                {f === 'all' ? `All (${totalShown})` : CATEGORY_LABELS[f]}
-              </button>
+          {/* Stat pills */}
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {[
+              { n: allEvents.length, label: 'Events' },
+              { n: docCount, label: 'Primary sources' },
+              { n: `${1339}–${2026}`, label: 'Years covered' },
+            ].map(s => (
+              <div key={s.label} style={{
+                display: 'flex', alignItems: 'baseline', gap: '0.35rem',
+                padding: '0.4rem 0.75rem',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '20px',
+              }}>
+                <span style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  color: 'var(--color-saffron)',
+                }}>
+                  {s.n}
+                </span>
+                <span style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.58rem',
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-ash-text)',
+                }}>
+                  {s.label}
+                </span>
+              </div>
             ))}
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'clamp(160px,18vw,220px) 1fr', gap: '0 3rem', alignItems: 'start' }}>
+        {/* ── Search + filter ── */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.6rem',
+          marginBottom: '3rem',
+          padding: '0.875rem 1rem',
+          background: 'rgba(255,255,255,0.024)',
+          border: '1px solid rgba(255,255,255,0.07)',
+          borderRadius: '10px',
+          alignItems: 'center',
+        }}>
+          <div style={{ position: 'relative', flex: '1 1 220px', minWidth: '180px' }}>
+            <span style={{
+              position: 'absolute', left: '0.7rem', top: '50%',
+              transform: 'translateY(-50%)', pointerEvents: 'none',
+              color: 'rgba(255,255,255,0.25)', fontSize: '0.9rem',
+            }}>
+              ⌕
+            </span>
+            <input
+              type="search"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search events, years, locations…"
+              style={{
+                width: '100%',
+                padding: '0.5rem 0.875rem 0.5rem 1.875rem',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.09)',
+                borderRadius: '6px',
+                fontFamily: 'var(--font-body)',
+                fontSize: '0.875rem',
+                color: 'var(--color-snow)',
+                outline: 'none',
+                cursor: 'text',
+              }}
+            />
+          </div>
 
-          {/* Left: Era nav (sticky) */}
+          <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+            {(['all', 'political', 'conflict', 'cultural', 'humanitarian'] as Filter[]).map(f => {
+              const on = filter === f;
+              const color = f === 'all' ? 'var(--color-saffron)' : CAT[f]?.color ?? 'var(--color-saffron)';
+              const cnt = f === 'all'
+                ? filtered.length
+                : filtered.filter(e => e.category === f).length;
+              return (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.6rem',
+                    letterSpacing: '0.13em',
+                    textTransform: 'uppercase',
+                    padding: '0.38rem 0.7rem',
+                    borderRadius: '4px',
+                    border: `1px solid ${on ? color : 'rgba(255,255,255,0.1)'}`,
+                    background: on ? (f === 'all' ? 'rgba(201,144,26,0.12)' : `${color}14`) : 'transparent',
+                    color: on ? color : 'rgba(255,255,255,0.35)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {f === 'all' ? `All (${cnt})` : `${CAT[f]?.label} (${cnt})`}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Body grid ── */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'clamp(150px, 15vw, 200px) 1fr',
+          gap: '0 2.5rem',
+          alignItems: 'start',
+        }}>
+
+          {/* ── Left sticky nav ── */}
           <div style={{ position: 'sticky', top: '5rem' }}>
             <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
-              letterSpacing: '0.18em', textTransform: 'uppercase',
-              color: 'var(--color-ash-text)', marginBottom: '1rem',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.56rem',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.25)',
+              marginBottom: '0.75rem',
+              paddingLeft: '0.75rem',
             }}>
-              Jump to era
+              Eras
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+
+            <nav aria-label="Jump to historical era">
               {ERAS.map(era => {
-                const count = eventsByEra.find(e => e.era.id === era.id)?.events.length ?? 0;
-                const isActive = activeEra === era.id;
+                const on = activeEra === era.id;
+                const cnt = grouped.find(g => g.era.id === era.id)?.events.length ?? 0;
                 return (
                   <button
                     key={era.id}
                     onClick={() => scrollToEra(era.id)}
+                    aria-current={on ? 'true' : undefined}
                     style={{
-                      textAlign: 'left', border: 'none',
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      border: 'none',
+                      background: on ? `${era.accent}10` : 'none',
                       padding: '0.5rem 0.75rem',
-                      borderLeft: `2px solid ${isActive ? era.color : 'rgba(255,255,255,0.08)'}`,
-                      borderRadius: '0 4px 4px 0',
-                      background: isActive ? `${era.color}0f` : 'transparent',
-                      cursor: 'pointer', transition: 'all 0.2s',
+                      borderLeft: `2px solid ${on ? era.accent : 'rgba(255,255,255,0.07)'}`,
+                      borderRadius: '0 5px 5px 0',
+                      marginBottom: '2px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
                     }}
                   >
                     <div style={{
-                      fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
-                      letterSpacing: '0.1em',
-                      color: isActive ? era.color : 'var(--color-ash-text)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.58rem',
+                      letterSpacing: '0.08em',
+                      color: on ? era.accent : 'rgba(255,255,255,0.25)',
                       marginBottom: '1px',
                     }}>
                       {era.range}
                     </div>
                     <div style={{
-                      fontFamily: 'var(--font-body)', fontSize: '0.78rem',
-                      color: isActive ? 'var(--color-snow)' : 'var(--color-snow-dim)',
-                      lineHeight: 1.3, fontWeight: isActive ? 600 : 400,
+                      fontFamily: 'var(--font-body)',
+                      fontSize: '0.77rem',
+                      color: on ? 'var(--color-snow)' : 'rgba(255,255,255,0.45)',
+                      lineHeight: 1.3,
+                      fontWeight: on ? 600 : 400,
                     }}>
                       {era.name}
                     </div>
-                    {count > 0 && (
+                    {cnt > 0 && (
                       <div style={{
-                        fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
-                        color: `${era.color}80`, marginTop: '2px',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.54rem',
+                        color: on ? `${era.accent}80` : 'rgba(255,255,255,0.18)',
+                        marginTop: '1px',
                       }}>
-                        {count} event{count !== 1 ? 's' : ''}
+                        {cnt} event{cnt !== 1 ? 's' : ''}
                       </div>
                     )}
                   </button>
                 );
               })}
-            </div>
+            </nav>
 
-            {/* Source legend */}
+            {/* Category legend */}
             <div style={{
-              marginTop: '2rem', paddingTop: '1.5rem',
+              marginTop: '1.75rem',
+              paddingTop: '1.25rem',
               borderTop: '1px solid rgba(255,255,255,0.06)',
             }}>
               <div style={{
-                fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
-                letterSpacing: '0.18em', textTransform: 'uppercase',
-                color: 'var(--color-ash-text)', marginBottom: '0.75rem',
-              }}>Legend</div>
-              {Object.entries(CATEGORY_COLORS).map(([cat, color]) => (
-                <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '2px', background: color, flexShrink: 0 }} />
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--color-ash-text)' }}>
-                    {CATEGORY_LABELS[cat]}
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.56rem',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.25)',
+                marginBottom: '0.6rem',
+                paddingLeft: '0.1rem',
+              }}>
+                Legend
+              </div>
+              {Object.entries(CAT).map(([key, { color, label }]) => (
+                <div key={key} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  marginBottom: '0.3rem',
+                  paddingLeft: '0.1rem',
+                }}>
+                  <div style={{
+                    width: '12px', height: '2px',
+                    borderRadius: '1px',
+                    background: color,
+                    flexShrink: 0,
+                  }} />
+                  <span style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.6rem',
+                    color: 'rgba(255,255,255,0.3)',
+                  }}>
+                    {label}
                   </span>
                 </div>
               ))}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.6rem' }}>
-                <span style={{ fontSize: '0.7rem' }}>📄</span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--color-ash-text)' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                marginTop: '0.4rem',
+                paddingLeft: '0.1rem',
+              }}>
+                <span style={{ fontSize: '0.6rem' }}>📄</span>
+                <span style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.6rem',
+                  color: 'rgba(255,255,255,0.3)',
+                }}>
                   Primary source
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Right: Events by era */}
+          {/* ── Event feed ── */}
           <div>
-            {eventsByEra.map(({ era, events: eraEvents }) => {
-              if (eraEvents.length === 0 && (filter !== 'all' || search)) return null;
+            {grouped.map(({ era, events: eraEvents }) => {
+              /* Hide empty eras when filtering */
+              if (eraEvents.length === 0 && (filter !== 'all' || search.trim() !== '')) return null;
+
               return (
                 <div
                   key={era.id}
-                  id={era.id}
+                  data-era={era.id}
                   ref={el => { eraRefs.current[era.id] = el; }}
-                  style={{ marginBottom: '3.5rem' }}
+                  style={{ marginBottom: '4.5rem', scrollMarginTop: '5rem' }}
                 >
-                  {/* Era header */}
-                  <div style={{
-                    padding: '1.25rem 1.5rem',
-                    background: era.bg,
-                    border: `1px solid ${era.color}25`,
-                    borderLeft: `4px solid ${era.color}`,
-                    borderRadius: '8px',
-                    marginBottom: '2rem',
-                  }}>
-                    <div style={{
-                      fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-                      letterSpacing: '0.18em', textTransform: 'uppercase',
-                      color: era.color, marginBottom: '0.3rem',
-                    }}>
-                      {era.range}
-                    </div>
-                    <div style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
-                      color: 'var(--color-snow)', marginBottom: '0.4rem',
-                    }}>
-                      {era.name}
-                    </div>
-                    <div style={{
-                      fontFamily: 'var(--font-display)', fontStyle: 'italic',
-                      fontSize: '0.9rem', color: 'var(--color-snow-dim)', lineHeight: 1.5,
-                    }}>
-                      {era.tagline}
-                    </div>
-                  </div>
+                  <EraHeader era={era} count={eraEvents.length} />
 
-                  {/* Events */}
                   {eraEvents.length > 0 ? (
                     eraEvents.map((event, i) => (
-                      <EventCard key={`${event.year}-${i}`} event={event} eraColor={era.color} />
+                      <EventCard
+                        key={`${event.year}-${i}`}
+                        event={event}
+                        accent={era.accent}
+                        isLast={i === eraEvents.length - 1}
+                      />
                     ))
                   ) : (
                     <p style={{
-                      fontFamily: 'var(--font-mono)', fontSize: '0.75rem',
-                      color: 'var(--color-ash-text)', padding: '1rem 0',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.7rem',
+                      letterSpacing: '0.06em',
+                      color: 'rgba(255,255,255,0.18)',
+                      padding: '0.75rem 0',
                     }}>
-                      No events match the current filter in this era.
+                      No events in this era match the active filter.
                     </p>
                   )}
                 </div>
               );
             })}
 
-            {totalShown === 0 && (
-              <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', color: 'var(--color-snow-dim)' }}>
-                  No events found.
+            {/* Empty state */}
+            {filtered.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '4rem 0 3rem' }}>
+                <div style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '1.2rem',
+                  color: 'rgba(255,255,255,0.3)',
+                  marginBottom: '1.25rem',
+                }}>
+                  No events found
                 </div>
                 <button
                   onClick={() => { setSearch(''); setFilter('all'); }}
                   style={{
-                    marginTop: '1rem', background: 'none',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    padding: '0.5rem 1.25rem', borderRadius: '4px',
-                    fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
-                    letterSpacing: '0.12em', textTransform: 'uppercase',
-                    color: 'var(--color-snow-dim)', cursor: 'pointer',
+                    background: 'none',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    padding: '0.5rem 1.5rem',
+                    borderRadius: '5px',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.65rem',
+                    letterSpacing: '0.13em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(255,255,255,0.4)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
                   }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.3)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}
                 >
                   Clear filters
                 </button>
               </div>
             )}
 
-            {/* Footer note */}
-            <div style={{
-              marginTop: '2rem', paddingTop: '2rem',
-              borderTop: '1px solid rgba(255,255,255,0.06)',
-            }}>
-              <p style={{
-                fontFamily: 'var(--font-display)', fontStyle: 'italic',
-                fontSize: 'clamp(0.9rem, 1.5vw, 1.05rem)',
-                color: 'var(--color-snow-dim)', lineHeight: 1.7, margin: 0,
+            {/* Closing note */}
+            {filtered.length > 0 && (
+              <div style={{
+                marginTop: '1rem',
+                paddingTop: '2.5rem',
+                borderTop: '1px solid rgba(255,255,255,0.05)',
               }}>
-                Every year in this archive carries the weight of a people's endurance.
-                This timeline is a living document — as history unfolds, it will be updated.
-              </p>
-            </div>
+                <p style={{
+                  fontFamily: 'var(--font-display)',
+                  fontStyle: 'italic',
+                  fontSize: 'clamp(0.9rem, 1.4vw, 1.05rem)',
+                  color: 'rgba(255,255,255,0.22)',
+                  lineHeight: 1.7,
+                  margin: 0,
+                }}>
+                  Every year in this archive is a weight carried by real people.
+                  This is a living document — updated as history unfolds.
+                </p>
+              </div>
+            )}
           </div>
-
         </div>
       </div>
       <div className="section-mist-bottom" />
