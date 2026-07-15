@@ -1,14 +1,57 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useTimeline } from '@/hooks/useTimeline';
-import type { TimelineEvent, TimelineDoc } from '@/types/api';
+import type { TimelineEvent } from '@/types/api';
 
-gsap.registerPlugin(ScrollTrigger);
-
-type Category = 'all' | 'political' | 'conflict' | 'cultural' | 'humanitarian';
+/* ── Eras ─────────────────────────────────────────────────────────────── */
+const ERAS = [
+  {
+    id: 'medieval',
+    name: 'Before the Wound',
+    range: '1339 – 1845',
+    tagline: 'Kingdoms, Mughals, and Sikhs — centuries before the map was drawn in blood.',
+    from: 1339, to: 1845,
+    color: '#4A7B8C',
+    bg: 'rgba(74,123,140,0.06)',
+  },
+  {
+    id: 'colonial',
+    name: 'Sold, Not Heard',
+    range: '1846 – 1946',
+    tagline: 'The British sell a people for 75 lakh rupees. A century of Dogra rule follows.',
+    from: 1846, to: 1946,
+    color: '#8B6914',
+    bg: 'rgba(139,105,20,0.07)',
+  },
+  {
+    id: 'partition',
+    name: 'The Unfinished Partition',
+    range: '1947 – 1988',
+    tagline: 'Independence divides a subcontinent — but not this question. Three wars. One unresolved border.',
+    from: 1947, to: 1988,
+    color: '#8B2F3F',
+    bg: 'rgba(139,47,63,0.08)',
+  },
+  {
+    id: 'insurgency',
+    name: 'Fire Season',
+    range: '1989 – 2018',
+    tagline: 'Armed insurgency erupts. An estimated 70,000 dead. 250,000 Pandits displaced. Three decades of fire.',
+    from: 1989, to: 2018,
+    color: '#B85C38',
+    bg: 'rgba(184,92,56,0.07)',
+  },
+  {
+    id: 'present',
+    name: 'The New Reality',
+    range: '2019 – Present',
+    tagline: 'Article 370 revoked. Statehood dissolved. Operation Sindoor. The question remains open.',
+    from: 2019, to: 9999,
+    color: '#7B5EA7',
+    bg: 'rgba(123,94,167,0.07)',
+  },
+];
 
 const CATEGORY_COLORS: Record<string, string> = {
   political:    '#C97B2B',
@@ -17,1383 +60,520 @@ const CATEGORY_COLORS: Record<string, string> = {
   humanitarian: '#5A7B5A',
 };
 
-const CATEGORY_BG: Record<string, string> = {
-  political:    'rgba(201,123,43,0.07)',
-  conflict:     'rgba(139,47,63,0.12)',
-  cultural:     'rgba(74,123,140,0.09)',
-  humanitarian: 'rgba(90,123,90,0.10)',
+const CATEGORY_LABELS: Record<string, string> = {
+  political: 'Political', conflict: 'Conflict',
+  cultural: 'Cultural', humanitarian: 'Humanitarian',
 };
 
-const CATEGORY_GLOW: Record<string, string> = {
-  political:    'radial-gradient(ellipse 65% 55% at 72% 50%, rgba(201,123,43,0.14) 0%, transparent 70%)',
-  conflict:     'radial-gradient(ellipse 65% 55% at 72% 50%, rgba(139,47,63,0.20) 0%, transparent 70%)',
-  cultural:     'radial-gradient(ellipse 65% 55% at 72% 50%, rgba(74,123,140,0.14) 0%, transparent 70%)',
-  humanitarian: 'radial-gradient(ellipse 65% 55% at 72% 50%, rgba(90,123,90,0.14) 0%, transparent 70%)',
-};
+type Filter = 'all' | 'political' | 'conflict' | 'cultural' | 'humanitarian';
 
-const FILTERS: { key: Category; label: string }[] = [
-  { key: 'all',          label: 'All' },
-  { key: 'political',    label: 'Political' },
-  { key: 'conflict',     label: 'Conflict' },
-  { key: 'cultural',     label: 'Cultural' },
-  { key: 'humanitarian', label: 'Humanitarian' },
-];
-
-/* ─────────────────────────────────────────────
-   CANVAS EFFECT SYSTEM
-   Per-event visual language rendered on canvas
-   ───────────────────────────────────────────── */
-
-interface Dot {
-  x: number; y: number;
-  vx: number; vy: number;
-  life: number; maxLife: number;
-  size: number;
-}
-
-interface Ring {
-  x: number; y: number;
-  r: number; maxR: number;
-  alpha: number;
-}
-
-function getEffectType(event: TimelineEvent): string {
-  const yr = event.year;
-  if (yr === 1947) return 'partition';
-  if (yr === 1948 || yr === 1965) return 'shockwave';
-  if (yr === 1984) return 'snow';
-  if (yr === 1989) return 'fire';
-  if (yr === 1990) return 'exodus';
-  if (yr === 1999) return 'shockwave';
-  if (yr === 2019) return 'partition';
-  if (yr === 1931) return 'fire';
-  switch (event.category) {
-    case 'conflict':     return 'embers';
-    case 'humanitarian': return 'drift';
-    case 'political':    return 'scanlines';
-    case 'cultural':     return 'ripple';
-    default:             return 'drift';
-  }
-}
-
-function useCanvasEffect(
-  canvasRef: React.RefObject<HTMLCanvasElement | null>,
-  event: TimelineEvent | null,
-  color: string,
-) {
-  useEffect(() => {
-    if (!event || !canvasRef.current) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const type = getEffectType(event);
-
-    /* Resize canvas to match CSS display size */
-    const dpr = window.devicePixelRatio || 1;
-    const setSize = () => {
-      const W = canvas.offsetWidth;
-      const H = canvas.offsetHeight;
-      canvas.width  = W * dpr;
-      canvas.height = H * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    setSize();
-
-    /* Closure-local state */
-    let frame = 0;
-    let dots:  Dot[]  = [];
-    let rings: Ring[] = [];
-    let crackPoints: [number, number][] | null = null;
-    let raf: number;
-
-    /* Pre-generate partition crack path */
-    if (type === 'partition') {
-      const W = canvas.offsetWidth;
-      const H = canvas.offsetHeight;
-      crackPoints = [[W * 0.5, 0]];
-      let y = 0;
-      while (y < H + 20) {
-        y += 5 + Math.random() * 12;
-        crackPoints.push([W * 0.5 + (Math.random() - 0.5) * 28, y]);
-      }
-    }
-
-    const loop = () => {
-      const W = canvas.offsetWidth;
-      const H = canvas.offsetHeight;
-      ctx.clearRect(0, 0, W, H);
-
-      /* ── PARTITION / FRACTURE (1947, 2019) ── */
-      if (type === 'partition' && crackPoints) {
-        const progress  = Math.min(1, frame / 110);
-        const drawUpTo  = H * progress;
-        const glow      = 0.5 + Math.sin(frame * 0.04) * 0.15;
-
-        ctx.save();
-        ctx.lineWidth   = 1.8;
-        ctx.strokeStyle = color;
-        ctx.shadowColor = '#fff';
-        ctx.shadowBlur  = 14;
-        ctx.globalAlpha = glow;
-        ctx.beginPath();
-        for (let i = 0; i < crackPoints.length - 1; i++) {
-          const [x1, y1] = crackPoints[i];
-          const [x2, y2] = crackPoints[i + 1];
-          if (y1 > drawUpTo) break;
-          const t  = Math.min(1, (drawUpTo - y1) / Math.max(1, y2 - y1));
-          const ex = x1 + (x2 - x1) * t;
-          const ey = Math.min(y2, drawUpTo);
-          if (i === 0) ctx.moveTo(x1, y1); else ctx.lineTo(ex, ey);
-        }
-        ctx.stroke();
-        ctx.restore();
-
-        /* Secondary glow line (wider, dimmer) */
-        ctx.save();
-        ctx.lineWidth   = 5;
-        ctx.strokeStyle = color;
-        ctx.shadowColor = color;
-        ctx.shadowBlur  = 28;
-        ctx.globalAlpha = glow * 0.25;
-        ctx.beginPath();
-        for (let i = 0; i < crackPoints.length - 1; i++) {
-          const [x1, y1] = crackPoints[i];
-          const [x2, y2] = crackPoints[i + 1];
-          if (y1 > drawUpTo) break;
-          const t  = Math.min(1, (drawUpTo - y1) / Math.max(1, y2 - y1));
-          const ex = x1 + (x2 - x1) * t;
-          const ey = Math.min(y2, drawUpTo);
-          if (i === 0) ctx.moveTo(x1, y1); else ctx.lineTo(ex, ey);
-        }
-        ctx.stroke();
-        ctx.restore();
-
-        /* Emit particles along the crack */
-        if (progress > 0.25 && frame % 4 === 0 && dots.length < 70) {
-          const idx = Math.floor(Math.random() * Math.floor(crackPoints.length * progress));
-          const pt  = crackPoints[Math.min(idx, crackPoints.length - 1)];
-          if (pt) {
-            dots.push({
-              x: pt[0], y: pt[1],
-              vx: (Math.random() - 0.5) * 2.5,
-              vy: (Math.random() - 0.5) * 2.5,
-              life: 0, maxLife: 28 + Math.random() * 22,
-              size: 0.8 + Math.random() * 1.8,
-            });
-          }
-        }
-
-        dots = dots.filter(d => {
-          d.x += d.vx; d.y += d.vy; d.life++;
-          const a = (1 - d.life / d.maxLife) * 0.85;
-          if (a <= 0.01) return false;
-          ctx.save();
-          ctx.globalAlpha = a;
-          ctx.fillStyle   = '#fff';
-          ctx.shadowColor = color;
-          ctx.shadowBlur  = 10;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-          return true;
-        });
-      }
-
-      /* ── SHOCKWAVE / KARGIL / WARS ── */
-      else if (type === 'shockwave') {
-        /* Spawn rings */
-        if (frame % 38 === 0 && rings.length < 7) {
-          const cx = W * 0.1 + Math.random() * W * 0.8;
-          const cy = H * 0.1 + Math.random() * H * 0.8;
-          rings.push({ x: cx, y: cy, r: 3, maxR: 55 + Math.random() * 90, alpha: 1 });
-
-          /* Burst sparks at ring origin */
-          if (dots.length < 50) {
-            for (let i = 0; i < 6; i++) {
-              const a = (Math.PI * 2 * i) / 6 + Math.random() * 0.6;
-              dots.push({
-                x: cx, y: cy,
-                vx: Math.cos(a) * (1.5 + Math.random() * 2.5),
-                vy: Math.sin(a) * (1.5 + Math.random() * 2.5),
-                life: 0, maxLife: 22 + Math.random() * 18,
-                size: 1.5 + Math.random() * 2,
-              });
-            }
-          }
-        }
-
-        rings = rings.filter(ring => {
-          ring.r    += 2;
-          ring.alpha = Math.pow(1 - ring.r / ring.maxR, 1.4) * 0.75;
-          if (ring.alpha <= 0.01) return false;
-          ctx.save();
-          ctx.globalAlpha = ring.alpha;
-          ctx.strokeStyle = color;
-          ctx.lineWidth   = 1.5;
-          ctx.shadowColor = color;
-          ctx.shadowBlur  = 12;
-          ctx.beginPath();
-          ctx.arc(ring.x, ring.y, ring.r, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.restore();
-          return true;
-        });
-
-        dots = dots.filter(d => {
-          d.x  += d.vx; d.y += d.vy;
-          d.vx *= 0.93; d.vy *= 0.93;
-          d.life++;
-          const a = (1 - d.life / d.maxLife) * 0.9;
-          if (a <= 0.01) return false;
-          ctx.save();
-          ctx.globalAlpha = a;
-          ctx.fillStyle   = color;
-          ctx.shadowColor = color;
-          ctx.shadowBlur  = 8;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-          return true;
-        });
-      }
-
-      /* ── SNOW / SIACHEN ── */
-      else if (type === 'snow') {
-        if (frame % 3 === 0 && dots.length < 90) {
-          dots.push({
-            x: Math.random() * W,
-            y: -8,
-            vx: (Math.random() - 0.5) * 0.7,
-            vy: 0.55 + Math.random() * 1.2,
-            life: 0,
-            maxLife: (H + 20) / 0.85,
-            size: 0.8 + Math.random() * 2.4,
-          });
-        }
-        dots = dots.filter(d => {
-          d.x += d.vx + Math.sin(frame * 0.018 + d.y * 0.06) * 0.35;
-          d.y += d.vy;
-          d.life++;
-          const a = 0.35 + 0.45 * (1 - d.life / d.maxLife);
-          if (d.y > H + 10) return false;
-          ctx.save();
-          ctx.globalAlpha = a;
-          ctx.fillStyle   = 'rgba(190,215,255,0.95)';
-          ctx.shadowColor = '#b0d8ff';
-          ctx.shadowBlur  = d.size * 2;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-          return true;
-        });
-      }
-
-      /* ── FIRE / INSURGENCY (1989, 1931) ── */
-      else if (type === 'fire') {
-        if (frame % 2 === 0 && dots.length < 80) {
-          dots.push({
-            x: W * 0.2 + Math.random() * W * 0.6,
-            y: H * 0.7 + Math.random() * H * 0.25,
-            vx: (Math.random() - 0.5) * 2,
-            vy: -(1.8 + Math.random() * 3),
-            life: 0,
-            maxLife: 55 + Math.random() * 50,
-            size: 2 + Math.random() * 4,
-          });
-        }
-        dots = dots.filter(d => {
-          d.x  += d.vx + Math.sin(frame * 0.04 + d.y * 0.04) * 0.5;
-          d.y  += d.vy;
-          d.vx *= 0.99;
-          d.life++;
-          const p = d.life / d.maxLife;
-          let a = p < 0.15 ? p / 0.15 : p > 0.45 ? (1 - p) / 0.55 : 1;
-          a *= 0.85;
-          if (a <= 0.01 || d.y < -10) return false;
-          /* Color shifts ember→yellow as it rises */
-          const hex = p < 0.3 ? '#FF6030' : p < 0.6 ? color : '#FF9060';
-          ctx.save();
-          ctx.globalAlpha = a;
-          ctx.fillStyle   = hex;
-          ctx.shadowColor = color;
-          ctx.shadowBlur  = d.size * 4;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-          return true;
-        });
-      }
-
-      /* ── EXODUS / PANDIT (1990) ── */
-      else if (type === 'exodus') {
-        if (frame % 2 === 0 && dots.length < 100) {
-          dots.push({
-            x: W + 15,
-            y: H * 0.1 + Math.random() * H * 0.8,
-            vx: -(1.4 + Math.random() * 2.2),
-            vy: (Math.random() - 0.5) * 0.5,
-            life: 0,
-            maxLife: (W + 30) / 1.8,
-            size: 1.8 + Math.random() * 2.5,
-          });
-        }
-
-        /* Subtle directional glow — the mass movement */
-        const grd = ctx.createLinearGradient(W, 0, 0, 0);
-        grd.addColorStop(0,   `${color}00`);
-        grd.addColorStop(0.5, `${color}15`);
-        grd.addColorStop(1,   `${color}00`);
-        ctx.fillStyle = grd;
-        ctx.fillRect(0, 0, W, H);
-
-        dots = dots.filter(d => {
-          d.x += d.vx; d.y += d.vy; d.life++;
-          const p = d.life / d.maxLife;
-          let a = p < 0.08 ? p / 0.08 : p > 0.82 ? (1 - p) / 0.18 : 0.55;
-          if (a <= 0.01 || d.x < -15) return false;
-          ctx.save();
-          ctx.globalAlpha = a;
-          ctx.fillStyle   = color;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-          return true;
-        });
-      }
-
-      /* ── EMBERS (generic conflict) ── */
-      else if (type === 'embers') {
-        if (frame % 3 === 0 && dots.length < 65) {
-          dots.push({
-            x: W * 0.2 + Math.random() * W * 0.6,
-            y: H * 0.75 + Math.random() * H * 0.2,
-            vx: (Math.random() - 0.5) * 1.8,
-            vy: -(1.2 + Math.random() * 2.2),
-            life: 0,
-            maxLife: 65 + Math.random() * 55,
-            size: 1.2 + Math.random() * 3,
-          });
-        }
-        dots = dots.filter(d => {
-          d.x  += d.vx + Math.sin(frame * 0.03 + d.y * 0.05) * 0.4;
-          d.y  += d.vy;
-          d.life++;
-          const p = d.life / d.maxLife;
-          let a = p < 0.15 ? p / 0.15 : p > 0.5 ? (1 - p) / 0.5 : 0.75;
-          if (a <= 0.01 || d.y < -10) return false;
-          ctx.save();
-          ctx.globalAlpha = a;
-          ctx.fillStyle   = color;
-          ctx.shadowColor = color;
-          ctx.shadowBlur  = d.size * 3.5;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-          return true;
-        });
-      }
-
-      /* ── DRIFT (generic humanitarian) ── */
-      else if (type === 'drift') {
-        if (frame % 5 === 0 && dots.length < 45) {
-          dots.push({
-            x: W + 10,
-            y: H * 0.05 + Math.random() * H * 0.9,
-            vx: -(0.5 + Math.random() * 1),
-            vy: -(0.15 + Math.random() * 0.3),
-            life: 0,
-            maxLife: 110 + Math.random() * 80,
-            size: 1.2 + Math.random() * 2,
-          });
-        }
-        dots = dots.filter(d => {
-          d.x += d.vx; d.y += d.vy; d.life++;
-          const p = d.life / d.maxLife;
-          let a = p < 0.2 ? p / 0.2 : p > 0.7 ? (1 - p) / 0.3 : 0.4;
-          if (a <= 0.01 || d.x < -15 || d.y < -15) return false;
-          ctx.save();
-          ctx.globalAlpha = a;
-          ctx.fillStyle   = color;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-          return true;
-        });
-      }
-
-      /* ── RIPPLE (cultural) ── */
-      else if (type === 'ripple') {
-        if (frame % 48 === 0 && rings.length < 5) {
-          rings.push({
-            x: W * 0.55 + (Math.random() - 0.5) * W * 0.3,
-            y: H * 0.5  + (Math.random() - 0.5) * H * 0.3,
-            r: 0,
-            maxR: Math.min(W, H) * (0.4 + Math.random() * 0.3),
-            alpha: 0.45,
-          });
-        }
-        rings = rings.filter(ring => {
-          ring.r += 1.1;
-          ring.alpha = (1 - ring.r / ring.maxR) * 0.38;
-          if (ring.alpha <= 0.005) return false;
-          ctx.save();
-          ctx.globalAlpha = ring.alpha;
-          ctx.strokeStyle = color;
-          ctx.lineWidth   = 1;
-          ctx.beginPath();
-          ctx.arc(ring.x, ring.y, ring.r, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.restore();
-          return true;
-        });
-
-        /* Inner geometric: a slowly rotating hexagon outline */
-        const cx = W * 0.6, cy = H * 0.5;
-        const hexR = Math.min(W, H) * 0.18;
-        const rot  = frame * 0.003;
-        ctx.save();
-        ctx.globalAlpha = 0.07 + Math.sin(frame * 0.03) * 0.03;
-        ctx.strokeStyle = color;
-        ctx.lineWidth   = 1;
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-          const a = (Math.PI / 3) * i + rot;
-          const x = cx + hexR * Math.cos(a);
-          const y = cy + hexR * Math.sin(a);
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      /* ── SCANLINES (political) ── */
-      else if (type === 'scanlines') {
-        const n = 5;
-        for (let i = 0; i < n; i++) {
-          const speed = 0.35 + i * 0.07;
-          const y     = ((frame * speed + i * (H / n)) % H);
-          const a     = 0.07 + 0.05 * Math.sin(frame * 0.05 + i * 1.3);
-          ctx.save();
-          ctx.globalAlpha = a;
-          ctx.strokeStyle = color;
-          ctx.lineWidth   = 1;
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(W, y);
-          ctx.stroke();
-          ctx.restore();
-        }
-
-        /* Occasional vertical data spike */
-        if (frame % 60 === 0 && dots.length < 12) {
-          for (let i = 0; i < 4; i++) {
-            dots.push({
-              x: Math.random() * W,
-              y: H,
-              vx: 0,
-              vy: -(2 + Math.random() * 3),
-              life: 0, maxLife: 30 + Math.random() * 20,
-              size: 1,
-            });
-          }
-        }
-        dots = dots.filter(d => {
-          d.y += d.vy; d.life++;
-          const a = (1 - d.life / d.maxLife) * 0.5;
-          if (a <= 0.01 || d.y < 0) return false;
-          ctx.save();
-          ctx.globalAlpha = a;
-          ctx.strokeStyle = color;
-          ctx.lineWidth   = 1;
-          ctx.beginPath();
-          ctx.moveTo(d.x, d.y);
-          ctx.lineTo(d.x, d.y + 12);
-          ctx.stroke();
-          ctx.restore();
-          return true;
-        });
-      }
-
-      frame++;
-      raf = requestAnimationFrame(loop);
-    };
-
-    raf = requestAnimationFrame(loop);
-    return () => {
-      cancelAnimationFrame(raf);
-      const W = canvas.offsetWidth;
-      const H = canvas.offsetHeight;
-      ctx.clearRect(0, 0, W, H);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [event?.year, event?.title, color]);
-}
-
-/* ─── Panel Canvas sub-component ─── */
-function PanelCanvas({
-  event,
-  color,
-}: {
-  event: TimelineEvent;
-  color: string;
-}) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  useCanvasEffect(canvasRef, event, color);
+/* ── Source Document Panel ─────────────────────────────────────────────── */
+function SourcePanel({ doc, onClose }: { doc: TimelineEvent['doc']; onClose: () => void }) {
+  if (!doc) return null;
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'absolute', inset: 0,
-        width: '100%', height: '100%',
-        pointerEvents: 'none',
-        zIndex: 1,
-        opacity: 0.7,
-      }}
-    />
-  );
-}
-
-/* ─────────────────────────────────────────────
-   ERA CONFIG — historical period groupings
-   ───────────────────────────────────────────── */
-
-type EraId = 'ancient' | 'colonial' | 'partition' | 'conflict' | 'modern';
-
-const ERAS: { id: EraId; label: string; range: string; accent: string }[] = [
-  { id: 'ancient',   label: 'Sultanate · Mughal · Afghan', range: '1339 – 1800', accent: 'rgba(201,123,43,0.50)' },
-  { id: 'colonial',  label: 'Colonial Period',             range: '1819 – 1946', accent: 'rgba(201,123,43,0.40)' },
-  { id: 'partition', label: 'Partition & Wars',            range: '1947 – 1983', accent: 'rgba(139,47,63,0.55)'  },
-  { id: 'conflict',  label: 'Conflict Era',                range: '1984 – 2004', accent: 'rgba(139,47,63,0.65)'  },
-  { id: 'modern',    label: 'Contemporary Kashmir',        range: '2005 – 2026', accent: 'rgba(74,123,140,0.55)' },
-];
-
-function getEraId(year: number): EraId {
-  if (year <= 1800) return 'ancient';
-  if (year <= 1946) return 'colonial';
-  if (year <= 1983) return 'partition';
-  if (year <= 2004) return 'conflict';
-  return 'modern';
-}
-
-/* ─────────────────────────────────────────────
-   MAIN TIMELINE COMPONENT
-   ───────────────────────────────────────────── */
-
-/* ── Doc chip button (appears in event panel) ──────────────────── */
-function DocChip({ doc, color, onClick }: { doc: TimelineDoc; color: string; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      data-cursor-hover
-      style={{
-        display: 'flex', alignItems: 'center', gap: '12px',
-        width: '100%', textAlign: 'left',
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderLeft: `2px solid ${color}60`,
-        borderRadius: '2px',
-        padding: '10px 14px',
-        cursor: 'none',
-        transition: 'background 220ms, border-left-color 220ms',
-      }}
-      onMouseEnter={e => {
-        e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-        e.currentTarget.style.borderLeftColor = color;
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-        e.currentTarget.style.borderLeftColor = `${color}60`;
-      }}
-    >
-      <svg width="13" height="15" viewBox="0 0 13 15" fill="none" style={{ flexShrink: 0, color: 'var(--color-ash)', opacity: 0.55 }}>
-        <rect x="0.5" y="0.5" width="12" height="14" rx="1" stroke="currentColor" strokeWidth="1"/>
-        <line x1="3" y1="4.5" x2="10" y2="4.5" stroke="currentColor" strokeWidth="0.8"/>
-        <line x1="3" y1="7.5" x2="10" y2="7.5" stroke="currentColor" strokeWidth="0.8"/>
-        <line x1="3" y1="10.5" x2="7.5" y2="10.5" stroke="currentColor" strokeWidth="0.8"/>
-      </svg>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-          letterSpacing: '0.20em', textTransform: 'uppercase',
-          color: color, marginBottom: '3px',
-        }}>
-          {doc.kind}
-        </div>
-        <div style={{
-          fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-          letterSpacing: '0.04em', color: 'var(--color-snow-dim)',
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>
-          {doc.name}
-        </div>
-      </div>
-      <span style={{
-        fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-        color: 'var(--color-ash)', opacity: 0.35, flexShrink: 0,
+    <div style={{
+      marginTop: '1rem',
+      padding: '1rem 1.25rem',
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(201,123,43,0.25)',
+      borderRadius: '6px',
+      position: 'relative',
+    }}>
+      <button
+        onClick={onClose}
+        aria-label="Close source"
+        style={{
+          position: 'absolute', top: '0.75rem', right: '0.75rem',
+          background: 'none', border: 'none', color: 'var(--color-ash-text)',
+          fontSize: '1rem', cursor: 'pointer', lineHeight: 1,
+        }}
+      >×</button>
+      <div style={{
+        fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+        letterSpacing: '0.18em', textTransform: 'uppercase',
+        color: '#C97B2B', marginBottom: '0.35rem',
       }}>
-        →
-      </span>
-    </button>
+        Primary Source · {doc.kind}
+      </div>
+      <div style={{
+        fontFamily: 'var(--font-display)', fontSize: '1rem',
+        color: 'var(--color-snow)', marginBottom: '0.5rem',
+      }}>
+        {doc.name}
+      </div>
+      <div style={{
+        fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
+        color: 'var(--color-ash-text)', marginBottom: '0.75rem',
+      }}>
+        {doc.date} · {doc.source}
+      </div>
+      <p style={{
+        fontFamily: 'var(--font-body)', fontSize: '0.875rem',
+        color: 'var(--color-snow-dim)', lineHeight: 1.65,
+        marginBottom: '0.75rem',
+      }}>
+        {doc.desc}
+      </p>
+      <a
+        href={doc.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+          letterSpacing: '0.12em', textTransform: 'uppercase',
+          color: '#C97B2B', textDecoration: 'none',
+          borderBottom: '1px solid rgba(201,123,43,0.4)',
+          paddingBottom: '1px',
+        }}
+      >
+        Read full document →
+      </a>
+    </div>
   );
 }
 
-/* ── Doc modal overlay ──────────────────────────────────────────── */
-function DocModal({ doc, color, onClose }: { doc: TimelineDoc; color: string; onClose: () => void }) {
+/* ── Event Card ────────────────────────────────────────────────────────── */
+function EventCard({ event, eraColor }: { event: TimelineEvent; eraColor: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [showSource, setShowSource] = useState(false);
+  const catColor = CATEGORY_COLORS[event.category] ?? eraColor;
+  const ref = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    /* Stop Lenis smooth scroll while modal is open */
-    const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
-    if (lenis) lenis.stop();
-    else document.body.style.overflow = 'hidden';
-
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-
-    return () => {
-      if (lenis) lenis.start();
-      else document.body.style.overflow = '';
-      document.removeEventListener('keydown', handler);
-    };
-  }, [onClose]);
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; } },
+      { threshold: 0.12 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   return (
     <div
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      ref={ref}
       style={{
-        position: 'fixed', inset: 0, zIndex: 9998,
-        background: 'rgba(10,8,6,0.82)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '24px',
+        opacity: 0, transform: 'translateY(24px)',
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+        display: 'grid', gridTemplateColumns: '72px 1fr',
+        gap: '0 1.25rem', paddingBottom: '2rem',
       }}
     >
+      {/* Year + spine */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '2px' }}>
+        <div style={{
+          fontFamily: 'var(--font-mono)', fontSize: '0.8rem',
+          fontWeight: 700, color: eraColor, letterSpacing: '0.05em',
+          marginBottom: '0.5rem', textAlign: 'center',
+        }}>
+          {event.year}
+        </div>
+        <div style={{ width: '1px', flexGrow: 1, background: `${eraColor}30` }} />
+      </div>
+
+      {/* Card */}
       <div style={{
-        position: 'relative',
-        width: '100%', maxWidth: '560px',
-        background: 'rgba(16,12,8,0.98)',
-        border: '1px solid rgba(255,255,255,0.07)',
-        borderTop: `2px solid ${color}90`,
-        borderRadius: '3px',
-        padding: 'var(--space-7)',
-        boxShadow: `0 32px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.03)`,
-      }}>
-
-        {/* Close */}
-        <button
-          onClick={onClose}
-          data-cursor-hover
-          aria-label="Close"
-          style={{
-            position: 'absolute', top: '14px', right: '16px',
-            background: 'none', border: 'none', cursor: 'none',
-            color: 'var(--color-snow-dim)', fontSize: '20px', lineHeight: 1,
-            padding: '4px 6px', opacity: 0.75,
-            transition: 'opacity 180ms',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.opacity = '1'; }}
-          onMouseLeave={e => { e.currentTarget.style.opacity = '0.75'; }}
-        >
-          ×
-        </button>
-
-        {/* Kind eyebrow */}
-        <div style={{
-          fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-          letterSpacing: '0.20em', textTransform: 'uppercase',
-          color: color, marginBottom: 'var(--space-3)',
-        }}>
-          Primary Source · {doc.kind}
+        background: 'rgba(255,255,255,0.025)',
+        border: `1px solid rgba(255,255,255,0.07)`,
+        borderLeft: `3px solid ${catColor}`,
+        borderRadius: '8px',
+        padding: '1rem 1.25rem',
+        cursor: 'pointer',
+        transition: 'background 0.2s',
+      }}
+        onClick={() => setExpanded(e => !e)}
+        onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.04)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.025)'; }}
+      >
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '0.5rem' }}>
+          <div style={{
+            fontFamily: 'var(--font-body)', fontWeight: 600,
+            fontSize: 'clamp(0.95rem, 1.5vw, 1.05rem)',
+            color: 'var(--color-snow)', lineHeight: 1.3,
+          }}>
+            {event.title}
+          </div>
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+            letterSpacing: '0.15em', textTransform: 'uppercase',
+            color: catColor, whiteSpace: 'nowrap', flexShrink: 0,
+            border: `1px solid ${catColor}40`, borderRadius: '3px',
+            padding: '2px 6px', marginTop: '2px',
+          }}>
+            {CATEGORY_LABELS[event.category]}
+          </div>
         </div>
 
-        {/* Document name */}
-        <h3 style={{
-          fontFamily: 'var(--font-display)', fontWeight: 400,
-          fontSize: 'clamp(1.1rem, 2.5vw, 1.45rem)',
-          color: 'var(--color-snow)', lineHeight: 1.2,
-          marginBottom: 'var(--space-2)',
-        }}>
-          {doc.name}
-        </h3>
+        {/* Location */}
+        {event.place && (
+          <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+            letterSpacing: '0.12em', color: 'var(--color-ash-text)',
+            marginBottom: '0.6rem',
+          }}>
+            📍 {event.place}
+          </div>
+        )}
 
-        {/* Date */}
-        <div style={{
-          fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-          letterSpacing: '0.20em', color: 'var(--color-ash-text)',
-          marginBottom: 'var(--space-5)',
-        }}>
-          {doc.date}
-        </div>
-
-        {/* Divider */}
-        <div style={{
-          height: '1px',
-          background: `linear-gradient(to right, ${color}45, transparent)`,
-          marginBottom: 'var(--space-5)',
-        }} />
-
-        {/* Description */}
+        {/* Description — always show, expand for full */}
         <p style={{
-          fontFamily: 'var(--font-body)', fontSize: 'var(--text-sm)',
-          lineHeight: 1.85, color: 'var(--color-snow-dim)',
-          marginBottom: 'var(--space-6)',
+          fontFamily: 'var(--font-body)', fontSize: '0.9rem',
+          color: 'var(--color-snow-dim)', lineHeight: 1.7,
+          margin: 0,
+          display: '-webkit-box',
+          WebkitLineClamp: expanded ? 'unset' : 3,
+          WebkitBoxOrient: 'vertical' as const,
+          overflow: expanded ? 'visible' : 'hidden',
         }}>
-          {doc.desc}
+          {event.description}
         </p>
 
-        {/* Footer: source + link */}
-        <div style={{
-          display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px',
-        }}>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-            letterSpacing: '0.20em', textTransform: 'uppercase',
-            color: 'var(--color-ash-text)', opacity: 0.7,
-          }}>
-            Source: {doc.source}
-          </div>
-          <a
-            href={doc.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cursor-hover
+        {/* Actions */}
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', alignItems: 'center' }}>
+          <button
+            onClick={e => { e.stopPropagation(); setExpanded(v => !v); }}
             style={{
-              fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-              letterSpacing: '0.20em', textTransform: 'uppercase',
-              color: color, cursor: 'none', textDecoration: 'none',
-              borderBottom: `1px solid ${color}45`, paddingBottom: '3px',
-              transition: 'letter-spacing 220ms',
+              background: 'none', border: 'none', padding: 0,
+              fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              color: 'var(--color-ash-text)', cursor: 'pointer',
             }}
-            onMouseEnter={e => { e.currentTarget.style.letterSpacing = '0.28em'; }}
-            onMouseLeave={e => { e.currentTarget.style.letterSpacing = '0.20em'; }}
           >
-            View source document →
-          </a>
+            {expanded ? '↑ Less' : '↓ Read more'}
+          </button>
+
+          {event.doc && (
+            <button
+              onClick={e => { e.stopPropagation(); setExpanded(true); setShowSource(v => !v); }}
+              style={{
+                background: 'none', border: 'none', padding: 0,
+                fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                color: '#C97B2B', cursor: 'pointer',
+                textDecoration: showSource ? 'underline' : 'none',
+              }}
+            >
+              📄 Primary Source
+            </button>
+          )}
         </div>
+
+        {showSource && event.doc && (
+          <SourcePanel doc={event.doc} onClose={() => setShowSource(false)} />
+        )}
       </div>
     </div>
   );
 }
 
-interface TimelineProps {
-  onSelectOnMap?: (event: TimelineEvent) => void;
-}
+/* ── Main Component ────────────────────────────────────────────────────── */
+export default function Timeline() {
+  const { events } = useTimeline();
+  const [filter, setFilter] = useState<Filter>('all');
+  const [search, setSearch] = useState('');
+  const [activeEra, setActiveEra] = useState<string | null>(null);
+  const eraRefs = useRef<Record<string, HTMLElement | null>>({});
+  const sectionRef = useRef<HTMLElement>(null);
 
-export default function Timeline({ onSelectOnMap }: TimelineProps) {
-  const sectionRef     = useRef<HTMLElement>(null);
-  const headerRef      = useRef<HTMLDivElement>(null);
-  const bgOverlayRef   = useRef<HTMLDivElement>(null);
-  const glowRef        = useRef<HTMLDivElement>(null);
-  const listRef        = useRef<HTMLDivElement>(null);
-  const panelRef       = useRef<HTMLDivElement>(null);
-  const ambientYearRef = useRef<HTMLDivElement>(null);
-  const panelYearRef   = useRef<HTMLSpanElement>(null);
-  const activeRowRef   = useRef<HTMLDivElement | null>(null);
+  const filtered = useMemo(() => {
+    return (events as TimelineEvent[]).filter(e => {
+      const matchCat = filter === 'all' || e.category === filter;
+      const q = search.toLowerCase();
+      const matchSearch = !q || e.title.toLowerCase().includes(q) || e.description.toLowerCase().includes(q) || String(e.year).includes(q);
+      return matchCat && matchSearch;
+    });
+  }, [events, filter, search]);
 
-  const [activeFilter, setActiveFilter] = useState<Category>('all');
-  const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
-  const [openDoc, setOpenDoc] = useState<{ doc: TimelineDoc; color: string } | null>(null);
-  const { events, isLoading } = useTimeline();
-
-  /* Close doc modal when user switches to a different event */
-  useEffect(() => { setOpenDoc(null); }, [selectedEvent]);
-
-  const filtered = activeFilter === 'all'
-    ? events
-    : events.filter(e => e.category === activeFilter);
-
-  /* Group filtered events by era, dropping empty eras */
-  const grouped = useMemo(() =>
-    ERAS.map(era => ({
-      era,
-      events: filtered.filter(e => getEraId(e.year) === era.id),
-    })).filter(g => g.events.length > 0),
-  [filtered]);
-
-  const isActive = (e: TimelineEvent) =>
-    selectedEvent?.year === e.year && selectedEvent?.title === e.title;
-
-  /* Section entry animation */
+  /* Highlight active era on scroll */
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(headerRef.current, {
-        opacity: 0, y: 26, duration: 0.9, ease: 'power3.out',
-        scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
-      });
-      gsap.from(listRef.current, {
-        opacity: 0, x: -20, duration: 0.9, ease: 'power3.out', delay: 0.12,
-        scrollTrigger: { trigger: sectionRef.current, start: 'top 75%', once: true },
-      });
-      gsap.from(panelRef.current, {
-        opacity: 0, x: 20, duration: 0.9, ease: 'power3.out', delay: 0.22,
-        scrollTrigger: { trigger: sectionRef.current, start: 'top 75%', once: true },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
-  }, []);
-
-  /* Panel content transition on event change */
-  useEffect(() => {
-    if (!panelRef.current) return;
-
-    if (selectedEvent) {
-      /* Stagger in content items */
-      gsap.from(panelRef.current.querySelectorAll('.pcr'), {
-        opacity: 0, y: 14, stagger: 0.06, duration: 0.5, ease: 'power3.out',
-      });
-      if (ambientYearRef.current) {
-        gsap.from(ambientYearRef.current, { opacity: 0, scale: 0.9, duration: 0.75, ease: 'power3.out' });
-      }
-      if (panelYearRef.current) {
-        const el = panelYearRef.current;
-        const target = selectedEvent.year;
-        gsap.from({}, {
-          duration: 0.85, ease: 'power2.out',
-          onUpdate: function () { el.textContent = String(Math.round(this.progress() * target)); },
-          onComplete: () => { el.textContent = String(target); },
+    const obs = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) setActiveEra(entry.target.id);
         });
-      }
-
-      /* Section atmosphere */
-      const cat = selectedEvent.category;
-      if (bgOverlayRef.current) {
-        bgOverlayRef.current.style.backgroundColor = CATEGORY_BG[cat] ?? 'transparent';
-        gsap.to(bgOverlayRef.current, { opacity: 1, duration: 0.9, ease: 'power2.inOut' });
-      }
-      if (glowRef.current) {
-        glowRef.current.style.background = CATEGORY_GLOW[cat] ?? '';
-        gsap.to(glowRef.current, { opacity: 1, duration: 0.7, ease: 'power2.out' });
-      }
-
-      if (activeRowRef.current) {
-        activeRowRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    } else {
-      if (bgOverlayRef.current) gsap.to(bgOverlayRef.current, { opacity: 0, duration: 0.6 });
-      if (glowRef.current)      gsap.to(glowRef.current,      { opacity: 0, duration: 0.5 });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedEvent]);
-
-  const handleSelect = useCallback((event: TimelineEvent) => {
-    setSelectedEvent(prev =>
-      prev?.year === event.year && prev?.title === event.title ? null : event
+      },
+      { rootMargin: '-40% 0px -50% 0px' },
     );
+    ERAS.forEach(era => {
+      const el = eraRefs.current[era.id];
+      if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
   }, []);
 
-  const color = selectedEvent ? (CATEGORY_COLORS[selectedEvent.category] ?? '#C97B2B') : '#C97B2B';
+  const scrollToEra = (id: string) => {
+    eraRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
-  /* Stats for empty panel */
-  const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    events.forEach(e => { counts[e.category] = (counts[e.category] ?? 0) + 1; });
-    return counts;
-  }, [events]);
+  const eventsByEra = useMemo(() => {
+    return ERAS.map(era => ({
+      era,
+      events: filtered.filter(e => e.year >= era.from && e.year <= era.to),
+    }));
+  }, [filtered]);
+
+  const totalShown = filtered.length;
+  const hasSource = (events as TimelineEvent[]).filter(e => e.doc).length;
 
   return (
     <section
-      id="timeline"
+      id="history"
       ref={sectionRef}
-      style={{
-        position: 'relative',
-        zIndex: 1,
-        padding: 'var(--section-py) 0',
-        overflow: 'hidden',
-      }}
+      style={{ position: 'relative', zIndex: 1, padding: 'var(--section-py) 0' }}
     >
-      {/* Category atmosphere overlay */}
-      <div ref={bgOverlayRef} style={{ position: 'absolute', inset: 0, backgroundColor: 'transparent', opacity: 0, transition: 'background-color 0.6s', pointerEvents: 'none', zIndex: 0 }} />
-      <div ref={glowRef}      style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, opacity: 0 }} />
-
       <div className="section-mist-top" />
+      <div className="section-container">
 
-      <div className="section-container" style={{ position: 'relative', zIndex: 1 }}>
-
-        {/* ── Header ── */}
-        <div ref={headerRef} style={{ marginBottom: 'var(--space-7)' }}>
-          <span className="eyebrow">1339 – 2026 · 687 Years of History</span>
+        {/* Header */}
+        <div style={{ maxWidth: '680px', marginBottom: 'clamp(2.5rem, 5vw, 4rem)' }}>
+          <span className="eyebrow">History</span>
           <h2 style={{
-            fontFamily: 'var(--font-display)', fontWeight: 400,
-            fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
-            color: 'var(--color-snow)', lineHeight: 1.08,
-            marginTop: 'var(--space-2)',
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+            fontWeight: 400, color: 'var(--color-snow)',
+            lineHeight: 1.1, marginBottom: '1rem',
           }}>
-            Kashmir Through Time
+            700 years of a people's story.
           </h2>
-        </div>
-
-        {/* ── Filter pills ── */}
-        <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-7)' }}>
-          {FILTERS.map(f => {
-            const fc   = CATEGORY_COLORS[f.key] ?? '#C97B2B';
-            const isOn = activeFilter === f.key;
-            return (
-              <button
-                key={f.key}
-                onClick={() => { setActiveFilter(f.key); setSelectedEvent(null); }}
-                data-cursor-hover
-                style={{
-                  fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                  letterSpacing: '0.20em', textTransform: 'uppercase',
-                  padding: '0.4rem 0.9rem', borderRadius: 'var(--radius-pill)',
-                  cursor: 'none',
-                  border: `1px solid ${isOn ? fc : 'rgba(255,255,255,0.11)'}`,
-                  backgroundColor: isOn ? fc : 'transparent',
-                  color: isOn ? 'var(--color-deep-slate)' : 'var(--color-snow-dim)',
-                  transition: 'all 250ms var(--ease-decisive)',
-                  fontWeight: isOn ? 700 : 400,
-                }}
-              >
-                {f.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ── Main grid: always 2-column ── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'clamp(280px, 42%, 500px) 1fr',
-          gap: 'clamp(1.5rem, 3vw, 3rem)',
-          alignItems: 'start',
-        }}>
-
-          {/* ── LEFT: Event chronicle list ── */}
-          <div ref={listRef}>
-            {isLoading ? (
-              <div style={{ height: 'clamp(500px, 68vh, 720px)', display: 'flex', alignItems: 'center', paddingLeft: '72px' }}>
-                <span style={{ color: 'var(--color-ash-text)', fontFamily: 'var(--font-mono)', fontSize: 'var(--text-sm)', letterSpacing: '0.14em' }}>Loading…</span>
-              </div>
-            ) : (
-              <div
-                data-lenis-prevent
-                style={{
-                  height: 'clamp(500px, 68vh, 720px)',
-                  overflowY: 'auto',
-                  paddingRight: '8px',
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: 'rgba(201,123,43,0.20) transparent',
-                }}
-              >
-                {/* Spine line */}
-                <div style={{ position: 'relative' }}>
-                  <div style={{
-                    position: 'absolute', left: '50px', top: 0, bottom: 0, width: '1px',
-                    background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.06) 8%, rgba(255,255,255,0.06) 92%, transparent)',
-                    pointerEvents: 'none',
-                  }} />
-
-                  {grouped.length === 0 && (
-                    <div style={{
-                      padding: '64px 0 64px 72px',
-                      fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                      letterSpacing: '0.20em', textTransform: 'uppercase',
-                      color: 'var(--color-ash)', opacity: 0.4,
-                    }}>
-                      No {activeFilter} events in the timeline
-                    </div>
-                  )}
-
-                  {grouped.map(({ era, events: eraEvents }) => (
-                    <div key={era.id}>
-                      {/* Era separator */}
-                      <div style={{
-                        padding: '22px 0 8px 0',
-                      }}>
-                        {/* Label row: spacer → label text → line */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ width: '50px', flexShrink: 0 }} />
-                          <div style={{ flexShrink: 0 }}>
-                            <span style={{
-                              fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                              letterSpacing: '0.20em', textTransform: 'uppercase',
-                              color: 'var(--color-snow)',
-                              fontWeight: 500,
-                            }}>
-                              {era.label}
-                            </span>
-                          </div>
-                          <div style={{
-                            flex: 1, height: '1px',
-                            background: `linear-gradient(to right, ${era.accent}, transparent)`,
-                          }} />
-                          <span style={{
-                            fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                            letterSpacing: '0.20em',
-                            color: era.accent.replace(/[\d.]+\)$/, '1)'),
-                            flexShrink: 0,
-                            fontWeight: 600,
-                          }}>
-                            {era.range}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Events in this era */}
-                      {eraEvents.map(event => {
-                        const ec     = CATEGORY_COLORS[event.category] ?? '#C97B2B';
-                        const active = isActive(event);
-                        const dimmed = selectedEvent !== null && !active;
-
-                        return (
-                          <div
-                            key={`${event.year}-${event.title}`}
-                            ref={el => { if (active) activeRowRef.current = el; }}
-                            onClick={() => handleSelect(event)}
-                            data-cursor-hover
-                            style={{
-                              display: 'flex', alignItems: 'center',
-                              gap: '12px',
-                              padding: active ? '10px 8px 10px 0' : '7px 8px 7px 0',
-                              cursor: 'none',
-                              position: 'relative',
-                              opacity: dimmed ? 0.18 : 1,
-                              transition: 'opacity 350ms ease, background-color 200ms, padding 200ms',
-                              backgroundColor: active ? `${ec}12` : 'transparent',
-                              borderRadius: '4px',
-                              borderLeft: active ? `2px solid ${ec}` : '2px solid transparent',
-                              paddingLeft: active ? '6px' : '0',
-                            }}
-                            onMouseEnter={e => { if (!active && !dimmed) e.currentTarget.style.backgroundColor = `${ec}07`; }}
-                            onMouseLeave={e => { if (!active) e.currentTarget.style.backgroundColor = active ? `${ec}12` : 'transparent'; }}
-                          >
-                            {/* Year */}
-                            <span style={{
-                              fontFamily: 'var(--font-display)',
-                              fontSize: active ? '1.25rem' : '1rem',
-                              fontWeight: 400,
-                              color: active ? ec : `${ec}50`,
-                              lineHeight: 1, width: '50px', flexShrink: 0,
-                              textAlign: 'right',
-                              transition: 'all 280ms',
-                              textShadow: active ? `0 0 20px ${ec}55` : 'none',
-                              letterSpacing: '-0.01em',
-                            }}>
-                              {event.year}
-                            </span>
-
-                            {/* Spine dot */}
-                            <div style={{
-                              width: active ? '7px' : '4px', height: active ? '7px' : '4px',
-                              borderRadius: '50%',
-                              backgroundColor: active ? ec : `${ec}40`,
-                              flexShrink: 0,
-                              transition: 'all 280ms',
-                              boxShadow: active ? `0 0 10px ${ec}90` : 'none',
-                              marginLeft: '-0.5px',
-                            }} />
-
-                            {/* Title + meta */}
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{
-                                fontFamily: 'var(--font-display)',
-                                fontSize: active ? '0.95rem' : '0.875rem',
-                                fontWeight: 400,
-                                color: active ? 'var(--color-snow)' : 'var(--color-snow-dim)',
-                                lineHeight: 1.25, marginBottom: '2px',
-                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                transition: 'color 280ms, font-size 280ms',
-                              }}>
-                                {event.title}
-                              </div>
-                              <div style={{
-                                fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                                letterSpacing: '0.20em', textTransform: 'uppercase',
-                                color: active ? ec : 'var(--color-ash)',
-                                opacity: active ? 0.8 : 0.4,
-                                transition: 'all 280ms',
-                              }}>
-                                {event.category} · {event.place}
-                              </div>
-                            </div>
-
-                            {/* Category dot */}
-                            <div style={{
-                              width: '5px', height: '5px', borderRadius: '50%',
-                              backgroundColor: ec, opacity: active ? 0.9 : 0.3,
-                              flexShrink: 0, transition: 'opacity 280ms',
-                            }} />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <p style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'clamp(0.95rem, 1.5vw, 1.1rem)',
+            color: 'var(--color-snow-dim)', lineHeight: 1.7,
+            marginBottom: '0.5rem',
+          }}>
+            An interactive research archive spanning the medieval sultanate to Operation Sindoor.
+            {hasSource > 0 && (
+              <> {hasSource} events link directly to primary source documents — treaties, UN resolutions, constitutional orders, court judgments.</>
             )}
+          </p>
+        </div>
+
+        {/* Search + filters */}
+        <div style={{
+          display: 'flex', flexWrap: 'wrap', gap: '0.75rem',
+          marginBottom: '2.5rem', alignItems: 'center',
+        }}>
+          <input
+            type="search"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search events, years, places…"
+            style={{
+              flex: '1 1 240px', minWidth: '220px',
+              padding: '0.55rem 1rem',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '6px',
+              fontFamily: 'var(--font-body)', fontSize: '0.9rem',
+              color: 'var(--color-snow)',
+              outline: 'none',
+            }}
+          />
+          <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+            {(['all', 'political', 'conflict', 'cultural', 'humanitarian'] as Filter[]).map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                style={{
+                  fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+                  letterSpacing: '0.14em', textTransform: 'uppercase',
+                  padding: '0.4rem 0.8rem', borderRadius: '4px',
+                  border: `1px solid ${filter === f ? (CATEGORY_COLORS[f] ?? 'var(--color-saffron)') : 'rgba(255,255,255,0.12)'}`,
+                  background: filter === f ? `${CATEGORY_COLORS[f] ?? 'var(--color-saffron)'}18` : 'transparent',
+                  color: filter === f ? (CATEGORY_COLORS[f] ?? 'var(--color-saffron)') : 'var(--color-ash-text)',
+                  cursor: 'pointer', transition: 'all 0.15s',
+                }}
+              >
+                {f === 'all' ? `All (${totalShown})` : CATEGORY_LABELS[f]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'clamp(160px,18vw,220px) 1fr', gap: '0 3rem', alignItems: 'start' }}>
+
+          {/* Left: Era nav (sticky) */}
+          <div style={{ position: 'sticky', top: '5rem' }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+              letterSpacing: '0.18em', textTransform: 'uppercase',
+              color: 'var(--color-ash-text)', marginBottom: '1rem',
+            }}>
+              Jump to era
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              {ERAS.map(era => {
+                const count = eventsByEra.find(e => e.era.id === era.id)?.events.length ?? 0;
+                const isActive = activeEra === era.id;
+                return (
+                  <button
+                    key={era.id}
+                    onClick={() => scrollToEra(era.id)}
+                    style={{
+                      textAlign: 'left', border: 'none',
+                      padding: '0.5rem 0.75rem',
+                      borderLeft: `2px solid ${isActive ? era.color : 'rgba(255,255,255,0.08)'}`,
+                      borderRadius: '0 4px 4px 0',
+                      background: isActive ? `${era.color}0f` : 'transparent',
+                      cursor: 'pointer', transition: 'all 0.2s',
+                    }}
+                  >
+                    <div style={{
+                      fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
+                      letterSpacing: '0.1em',
+                      color: isActive ? era.color : 'var(--color-ash-text)',
+                      marginBottom: '1px',
+                    }}>
+                      {era.range}
+                    </div>
+                    <div style={{
+                      fontFamily: 'var(--font-body)', fontSize: '0.78rem',
+                      color: isActive ? 'var(--color-snow)' : 'var(--color-snow-dim)',
+                      lineHeight: 1.3, fontWeight: isActive ? 600 : 400,
+                    }}>
+                      {era.name}
+                    </div>
+                    {count > 0 && (
+                      <div style={{
+                        fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
+                        color: `${era.color}80`, marginTop: '2px',
+                      }}>
+                        {count} event{count !== 1 ? 's' : ''}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Source legend */}
+            <div style={{
+              marginTop: '2rem', paddingTop: '1.5rem',
+              borderTop: '1px solid rgba(255,255,255,0.06)',
+            }}>
+              <div style={{
+                fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+                letterSpacing: '0.18em', textTransform: 'uppercase',
+                color: 'var(--color-ash-text)', marginBottom: '0.75rem',
+              }}>Legend</div>
+              {Object.entries(CATEGORY_COLORS).map(([cat, color]) => (
+                <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '2px', background: color, flexShrink: 0 }} />
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--color-ash-text)' }}>
+                    {CATEGORY_LABELS[cat]}
+                  </span>
+                </div>
+              ))}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.6rem' }}>
+                <span style={{ fontSize: '0.7rem' }}>📄</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--color-ash-text)' }}>
+                  Primary source
+                </span>
+              </div>
+            </div>
           </div>
 
-          {/* ── RIGHT: Persistent panel (empty state or event detail) ── */}
-          <div
-            ref={panelRef}
-            style={{
-              position: 'sticky', top: 'clamp(5rem, 7vw, 6rem)',
-              height: 'clamp(500px, 68vh, 720px)',
-              backgroundColor: 'var(--color-deep-slate-mid)',
-              border: `1px solid ${selectedEvent ? color + '22' : 'rgba(255,255,255,0.05)'}`,
-              borderRadius: 'var(--radius-lg)', overflow: 'hidden',
-              display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-              padding: 'clamp(2rem, 3.5vw, 3rem)',
-              boxShadow: selectedEvent
-                ? `0 40px 100px rgba(0,0,0,0.5), inset 0 1px 0 ${color}15`
-                : '0 20px 60px rgba(0,0,0,0.3)',
-              transition: 'border-color 0.5s, box-shadow 0.5s',
-            }}
-          >
-            {selectedEvent ? (
-              /* ── Selected event detail ── */
-              <>
-                <PanelCanvas event={selectedEvent} color={color} />
-
-                {/* Giant ambient year */}
-                <div ref={ambientYearRef} style={{
-                  position: 'absolute', top: '50%', left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(8rem, 16vw, 13rem)', fontWeight: 400, lineHeight: 0.9,
-                  color: color, opacity: 0.04,
-                  pointerEvents: 'none', whiteSpace: 'nowrap',
-                  letterSpacing: '-0.04em', userSelect: 'none', zIndex: 0,
-                }}>
-                  {selectedEvent.year}
-                </div>
-
-                {/* Inner glow */}
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: `radial-gradient(ellipse 80% 60% at 10% 100%, ${color}12 0%, transparent 65%)`,
-                  pointerEvents: 'none', zIndex: 0,
-                }} />
-
-                {/* Close */}
-                <button
-                  onClick={() => setSelectedEvent(null)}
-                  data-cursor-hover
-                  style={{
-                    position: 'absolute', top: 'var(--space-5)', right: 'var(--space-5)',
-                    background: 'none', border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: '50%', width: '28px', height: '28px',
-                    cursor: 'none', color: 'var(--color-ash-text)',
-                    fontSize: '14px', lineHeight: '28px', textAlign: 'center',
-                    transition: 'border-color 200ms, color 200ms', zIndex: 3,
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = color; (e.currentTarget as HTMLButtonElement).style.color = color; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-ash-text)'; }}
-                >×</button>
-
-                {/* Content */}
-                <div style={{ position: 'relative', zIndex: 2 }}>
-                  <div className="pcr" style={{ marginBottom: 'var(--space-4)' }}>
-                    <span style={{
-                      fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                      letterSpacing: '0.20em', textTransform: 'uppercase',
-                      color: color, borderBottom: `1px solid ${color}50`, paddingBottom: '3px',
+          {/* Right: Events by era */}
+          <div>
+            {eventsByEra.map(({ era, events: eraEvents }) => {
+              if (eraEvents.length === 0 && (filter !== 'all' || search)) return null;
+              return (
+                <div
+                  key={era.id}
+                  id={era.id}
+                  ref={el => { eraRefs.current[era.id] = el; }}
+                  style={{ marginBottom: '3.5rem' }}
+                >
+                  {/* Era header */}
+                  <div style={{
+                    padding: '1.25rem 1.5rem',
+                    background: era.bg,
+                    border: `1px solid ${era.color}25`,
+                    borderLeft: `4px solid ${era.color}`,
+                    borderRadius: '8px',
+                    marginBottom: '2rem',
+                  }}>
+                    <div style={{
+                      fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
+                      letterSpacing: '0.18em', textTransform: 'uppercase',
+                      color: era.color, marginBottom: '0.3rem',
                     }}>
-                      {selectedEvent.category}
-                    </span>
-                  </div>
-
-                  <div className="pcr" style={{ marginBottom: 'var(--space-2)' }}>
-                    <span ref={panelYearRef} style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: 'clamp(3rem, 5vw, 4.5rem)', fontWeight: 400,
-                      color: color, lineHeight: 1,
-                      textShadow: `0 0 48px ${color}50`,
-                      letterSpacing: '-0.02em',
-                    }}>
-                      {selectedEvent.year}
-                    </span>
-                  </div>
-
-                  <div className="pcr" style={{ marginBottom: 'var(--space-3)' }}>
-                    <h3 style={{
-                      fontFamily: 'var(--font-display)', fontWeight: 400,
-                      fontSize: 'clamp(1.3rem, 2.4vw, 2rem)',
-                      color: 'var(--color-snow)', lineHeight: 1.15, margin: 0,
-                    }}>
-                      {selectedEvent.title}
-                    </h3>
-                  </div>
-
-                  <div className="pcr" style={{ marginBottom: 'var(--space-5)' }}>
-                    <span style={{
-                      fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                      letterSpacing: '0.20em', textTransform: 'uppercase',
-                      color: 'var(--color-ash-text)',
-                    }}>
-                      ◎ {selectedEvent.place}
-                    </span>
-                  </div>
-
-                  <div className="pcr" style={{ height: '1px', background: `linear-gradient(to right, ${color}60, transparent)`, marginBottom: 'var(--space-5)' }} />
-
-                  <div className="pcr" style={{ marginBottom: 'var(--space-6)' }}>
-                    <p style={{
-                      fontFamily: 'var(--font-body)', fontSize: 'var(--text-sm)',
-                      lineHeight: 1.85, color: 'var(--color-snow-dim)', margin: 0,
-                    }}>
-                      {selectedEvent.description}
-                    </p>
-                  </div>
-
-                  <div className="pcr">
-                    <a
-                      href="#map"
-                      onClick={e => { e.preventDefault(); onSelectOnMap?.(selectedEvent); }}
-                      data-cursor-hover
-                      style={{
-                        fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                        letterSpacing: '0.20em', textTransform: 'uppercase',
-                        color: color, cursor: 'none',
-                        display: 'inline-flex', alignItems: 'center', gap: '8px',
-                        textDecoration: 'none',
-                        borderBottom: `1px solid ${color}45`, paddingBottom: '3px',
-                        transition: 'letter-spacing 220ms',
-                      }}
-                      onMouseEnter={e => { e.currentTarget.style.letterSpacing = '0.28em'; }}
-                      onMouseLeave={e => { e.currentTarget.style.letterSpacing = '0.20em'; }}
-                    >
-                      Locate on map →
-                    </a>
-                  </div>
-
-                  {selectedEvent.doc && (
-                    <div className="pcr" style={{ marginTop: 'var(--space-4)' }}>
-                      <DocChip
-                        doc={selectedEvent.doc}
-                        color={color}
-                        onClick={() => setOpenDoc({ doc: selectedEvent.doc!, color })}
-                      />
+                      {era.range}
                     </div>
+                    <div style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
+                      color: 'var(--color-snow)', marginBottom: '0.4rem',
+                    }}>
+                      {era.name}
+                    </div>
+                    <div style={{
+                      fontFamily: 'var(--font-display)', fontStyle: 'italic',
+                      fontSize: '0.9rem', color: 'var(--color-snow-dim)', lineHeight: 1.5,
+                    }}>
+                      {era.tagline}
+                    </div>
+                  </div>
+
+                  {/* Events */}
+                  {eraEvents.length > 0 ? (
+                    eraEvents.map((event, i) => (
+                      <EventCard key={`${event.year}-${i}`} event={event} eraColor={era.color} />
+                    ))
+                  ) : (
+                    <p style={{
+                      fontFamily: 'var(--font-mono)', fontSize: '0.75rem',
+                      color: 'var(--color-ash-text)', padding: '1rem 0',
+                    }}>
+                      No events match the current filter in this era.
+                    </p>
                   )}
                 </div>
-              </>
-            ) : (
-              /* ── Empty state: chronicle overture ── */
-              <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                {/* Ambient decorative rings */}
-                <div style={{
-                  position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden',
-                }}>
-                  {[1, 2, 3].map(i => (
-                    <div key={i} style={{
-                      position: 'absolute',
-                      top: '38%', left: '55%',
-                      transform: 'translate(-50%, -50%)',
-                      width: `${i * 120}px`, height: `${i * 120}px`,
-                      borderRadius: '50%',
-                      border: '1px solid rgba(201,123,43,0.06)',
-                      animation: `loc-pulse ${2.2 + i * 0.8}s ease-out infinite`,
-                      animationDelay: `${i * 0.7}s`,
-                    }} />
-                  ))}
-                </div>
+              );
+            })}
 
-                {/* Top: span of history */}
-                <div>
-                  <div style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 'clamp(3.5rem, 7vw, 6rem)', fontWeight: 400,
-                    color: 'rgba(201,123,43,0.12)', lineHeight: 0.9,
-                    letterSpacing: '-0.03em', userSelect: 'none',
-                    marginBottom: 'var(--space-4)',
-                  }}>
-                    1339
-                  </div>
-                  <div style={{
-                    fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                    letterSpacing: '0.20em', textTransform: 'uppercase',
-                    color: 'rgba(201,123,43,0.30)',
-                  }}>
-                    687 years of documented history
-                  </div>
+            {totalShown === 0 && (
+              <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', color: 'var(--color-snow-dim)' }}>
+                  No events found.
                 </div>
-
-                {/* Center: category breakdown */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {Object.entries(CATEGORY_COLORS).map(([cat, col]) => {
-                    const count = categoryCounts[cat] ?? 0;
-                    if (!count) return null;
-                    return (
-                      <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '22px', height: '1px', backgroundColor: col, opacity: 0.5, flexShrink: 0 }} />
-                        <div style={{
-                          flex: 1, height: '1px',
-                          background: `linear-gradient(to right, ${col}22, transparent)`,
-                          position: 'relative',
-                        }}>
-                          <div style={{
-                            position: 'absolute', left: 0, top: 0, height: '100%',
-                            width: `${(count / events.length) * 100}%`,
-                            background: `linear-gradient(to right, ${col}55, ${col}15)`,
-                            transition: 'width 0.8s ease',
-                          }} />
-                        </div>
-                        <span style={{
-                          fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                          letterSpacing: '0.20em', textTransform: 'uppercase',
-                          color: col, opacity: 0.7, width: '70px', textAlign: 'right', flexShrink: 0,
-                        }}>
-                          {count} {cat}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Bottom: CTA */}
-                <div>
-                  <div style={{ height: '1px', background: 'linear-gradient(to right, rgba(201,123,43,0.25), transparent)', marginBottom: 'var(--space-5)' }} />
-                  <div style={{
-                    fontFamily: 'var(--font-display)', fontStyle: 'italic',
-                    fontSize: 'clamp(1rem, 1.8vw, 1.3rem)',
-                    color: 'rgba(245,240,232,0.18)',
-                    lineHeight: 1.4, marginBottom: 'var(--space-3)',
-                  }}>
-                    Every year carries the weight<br />of a people's endurance.
-                  </div>
-                  <div style={{
-                    fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                    letterSpacing: '0.20em', textTransform: 'uppercase',
-                    color: 'rgba(201,123,43,0.35)',
-                  }}>
-                    ← Select a moment to explore
-                  </div>
-                  <div style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 'clamp(3.5rem, 7vw, 6rem)', fontWeight: 400,
-                    color: 'rgba(201,123,43,0.07)', lineHeight: 0.9,
-                    letterSpacing: '-0.03em', userSelect: 'none',
-                    marginTop: 'var(--space-4)', textAlign: 'right',
-                  }}>
-                    2026
-                  </div>
-                </div>
+                <button
+                  onClick={() => { setSearch(''); setFilter('all'); }}
+                  style={{
+                    marginTop: '1rem', background: 'none',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    padding: '0.5rem 1.25rem', borderRadius: '4px',
+                    fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
+                    letterSpacing: '0.12em', textTransform: 'uppercase',
+                    color: 'var(--color-snow-dim)', cursor: 'pointer',
+                  }}
+                >
+                  Clear filters
+                </button>
               </div>
             )}
+
+            {/* Footer note */}
+            <div style={{
+              marginTop: '2rem', paddingTop: '2rem',
+              borderTop: '1px solid rgba(255,255,255,0.06)',
+            }}>
+              <p style={{
+                fontFamily: 'var(--font-display)', fontStyle: 'italic',
+                fontSize: 'clamp(0.9rem, 1.5vw, 1.05rem)',
+                color: 'var(--color-snow-dim)', lineHeight: 1.7, margin: 0,
+              }}>
+                Every year in this archive carries the weight of a people's endurance.
+                This timeline is a living document — as history unfolds, it will be updated.
+              </p>
+            </div>
           </div>
 
         </div>
       </div>
-
       <div className="section-mist-bottom" />
-
-      {openDoc && (
-        <DocModal
-          doc={openDoc.doc}
-          color={openDoc.color}
-          onClose={() => setOpenDoc(null)}
-        />
-      )}
     </section>
   );
 }
