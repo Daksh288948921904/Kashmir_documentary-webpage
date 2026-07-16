@@ -33,7 +33,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       const itemsList = (body.items ?? [])
         .map((i: { name: string; qty: number; price: number }) => `${i.name} ×${i.qty} — ₹${i.price}`)
         .join('<br>');
-      await fetch('https://api.brevo.com/v3/smtp/email', {
+      const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -42,7 +42,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           subject: `New Order — ${name}`,
           htmlContent: `<b>Customer:</b> ${name}<br><b>Email:</b> ${email}<br><b>Phone:</b> ${phone}<br><b>Address:</b> ${address}<br><br><b>Items:</b><br>${itemsList}<br><br><b>Total: ₹${body.total}</b>`,
         }),
-      }).catch(() => null);
+      }).catch((e) => { console.error('[Brevo] fetch error:', e); return null; });
+      if (brevoRes) {
+        const brevoBody = await brevoRes.json().catch(() => null);
+        console.log('[Brevo] status:', brevoRes.status, 'body:', JSON.stringify(brevoBody));
+      }
     }
 
     return NextResponse.json({ success: true, order_id: data.id });
