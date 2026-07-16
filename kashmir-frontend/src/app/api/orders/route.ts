@@ -33,6 +33,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       const itemsList = (body.items ?? [])
         .map((i: { name: string; qty: number; price: number }) => `${i.name} ×${i.qty} — ₹${i.price}`)
         .join('<br>');
+      /* Admin notification */
       const brevoRes = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
@@ -46,6 +47,29 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       if (brevoRes) {
         const brevoBody = await brevoRes.json().catch(() => null);
         console.log('[Brevo] status:', brevoRes.status, 'body:', JSON.stringify(brevoBody));
+      }
+
+      /* Customer confirmation */
+      if (email) {
+        await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sender: { name: 'Kashmir Harvest', email: brevoFrom },
+            to: [{ email, name }],
+            subject: `Your order is confirmed — Kashmir Harvest`,
+            htmlContent: `
+              <p>Dear ${name},</p>
+              <p>Thank you for your order! We've received it and will be in touch soon to confirm delivery.</p>
+              <br>
+              <b>Order Summary</b><br>${itemsList}
+              <br><br><b>Total: ₹${body.total}</b>
+              <br><br><b>Delivery address:</b> ${address}
+              <br><br>If you have any questions, reply to this email or contact us.
+              <br><br>— Kashmir Harvest Team
+            `,
+          }),
+        }).catch(() => null);
       }
     }
 
