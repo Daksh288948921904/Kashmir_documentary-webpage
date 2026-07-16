@@ -7,10 +7,6 @@ export const dynamic = 'force-dynamic';
 const RIG360_URL = 'https://screening.rig360media.com/api/partner/session';
 
 export async function GET() {
-  if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json({ detail: 'Not found' }, { status: 404 });
-  }
-
   const s = getServerSettings();
   if (!s.screeningPartnerKey) {
     return NextResponse.json({ detail: 'SCREENING_PARTNER_KEY not set' }, { status: 503 });
