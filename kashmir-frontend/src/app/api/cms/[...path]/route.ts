@@ -246,7 +246,7 @@ async function social(req: NextRequest, path: string[]): Promise<NextResponse> {
     if (status) q = q.eq('overall_status', status);
     const { data, error, count } = await q;
     if (error) return NextResponse.json({ detail: error.message }, { status: 500 });
-    return NextResponse.json({ data: data ?? [], total: count ?? 0 });
+    return NextResponse.json({ posts: data ?? [], total: count ?? 0 });
   }
 
   if (req.method === 'POST' && !segment) {

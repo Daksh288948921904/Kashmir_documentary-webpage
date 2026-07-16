@@ -10,10 +10,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const body = await req.json();
     const db = getSupabaseAdmin();
     const { data, error } = await db.from('orders').insert({
-      customer_name:    body.name,
-      customer_email:   body.email,
-      customer_phone:   body.phone,
-      delivery_address: body.address,
+      customer_name:    body.customer_name    ?? body.name,
+      customer_email:   body.customer_email   ?? body.email,
+      customer_phone:   body.customer_phone   ?? body.phone,
+      delivery_address: body.delivery_address ?? body.address,
       items:            body.items,
       total:            body.total,
       status:           'new',
