@@ -1,24 +1,21 @@
 import { NextResponse } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const BACKEND = process.env.BACKEND_URL ?? 'http://localhost:8000';
-
-/* GET /api/products — public shop catalogue, forwarded to the FastAPI backend */
+/* GET /api/products — public shop catalogue from Supabase */
 export async function GET(): Promise<NextResponse> {
-  let upstream: Response;
   try {
-    upstream = await fetch(`${BACKEND}/api/products`);
-  } catch {
-    return NextResponse.json(
-      { detail: 'Shop backend is not running. Start it on port 8000.' },
-      { status: 502 },
-    );
+    const db = getSupabaseAdmin();
+    const { data, error } = await db
+      .from('products')
+      .select('*')
+      .eq('active', true)
+      .order('created_at', { ascending: true });
+    if (error) return NextResponse.json({ detail: error.message }, { status: 500 });
+    return NextResponse.json(data);
+  } catch (e) {
+    return NextResponse.json({ detail: String(e) }, { status: 500 });
   }
-  const text = await upstream.text();
-  return new NextResponse(text, {
-    status: upstream.status,
-    headers: { 'content-type': upstream.headers.get('content-type') ?? 'application/json' },
-  });
 }

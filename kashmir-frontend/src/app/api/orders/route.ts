@@ -1,29 +1,47 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const BACKEND = process.env.BACKEND_URL ?? 'http://localhost:8000';
-
-/* POST /api/orders — public shop checkout, forwarded to the FastAPI backend */
+/* POST /api/orders — save new shop order to Supabase */
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const body = await req.arrayBuffer();
-  let upstream: Response;
   try {
-    upstream = await fetch(`${BACKEND}/api/orders`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body,
-    });
-  } catch {
-    return NextResponse.json(
-      { detail: 'Shop backend is not running. Start it on port 8000.' },
-      { status: 502 },
-    );
+    const body = await req.json();
+    const db = getSupabaseAdmin();
+    const { data, error } = await db.from('orders').insert({
+      customer_name:    body.name,
+      customer_email:   body.email,
+      customer_phone:   body.phone,
+      delivery_address: body.address,
+      items:            body.items,
+      total:            body.total,
+      status:           'new',
+    }).select().single();
+
+    if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
+
+    /* Send Brevo notification if configured */
+    const brevoKey   = process.env.BREVO_API_KEY;
+    const brevoEmail = process.env.BREVO_TEAM_EMAIL;
+    if (brevoKey && brevoEmail) {
+      const itemsList = (body.items ?? [])
+        .map((i: { name: string; qty: number; price: number }) => `${i.name} ×${i.qty} — ₹${i.price}`)
+        .join('<br>');
+      await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender: { name: 'Kashmir Harvest', email: 'noreply@kashmirharvest.in' },
+          to: [{ email: brevoEmail }],
+          subject: `New Order — ${body.name}`,
+          htmlContent: `<b>Customer:</b> ${body.name}<br><b>Email:</b> ${body.email}<br><b>Phone:</b> ${body.phone}<br><b>Address:</b> ${body.address}<br><br><b>Items:</b><br>${itemsList}<br><br><b>Total: ₹${body.total}</b>`,
+        }),
+      }).catch(() => null);
+    }
+
+    return NextResponse.json({ success: true, order_id: data.id });
+  } catch (e) {
+    return NextResponse.json({ detail: String(e) }, { status: 500 });
   }
-  const text = await upstream.text();
-  return new NextResponse(text, {
-    status: upstream.status,
-    headers: { 'content-type': upstream.headers.get('content-type') ?? 'application/json' },
-  });
 }
