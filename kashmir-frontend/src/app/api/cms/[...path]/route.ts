@@ -225,17 +225,22 @@ async function instagram(req: NextRequest, path: string[]): Promise<NextResponse
 
 /* ── Router ───────────────────────────────────────────────────────────── */
 async function handler(req: NextRequest, { params }: { params: Params }): Promise<NextResponse> {
-  if (!(await authed(req))) return unauth();
+  try {
+    if (!(await authed(req))) return unauth();
 
-  const { path } = await params;
-  const resource = path[0];
+    const { path } = await params;
+    const resource = path[0];
 
-  if (resource === 'products')  return products(req, path);
-  if (resource === 'orders')    return orders(req, path);
-  if (resource === 'upload')    return upload(req);
-  if (resource === 'instagram') return instagram(req, path);
+    if (resource === 'products')  return products(req, path);
+    if (resource === 'orders')    return orders(req, path);
+    if (resource === 'upload')    return upload(req);
+    if (resource === 'instagram') return instagram(req, path);
 
-  return NextResponse.json({ detail: `Unknown resource: ${resource}` }, { status: 404 });
+    return NextResponse.json({ detail: `Unknown resource: ${resource}` }, { status: 404 });
+  } catch (e) {
+    console.error('[CMS API]', e);
+    return NextResponse.json({ detail: String(e) }, { status: 500 });
+  }
 }
 
 export const GET    = handler;
