@@ -25,6 +25,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const brevoKey   = process.env.BREVO_API_KEY;
     const brevoEmail = process.env.BREVO_TEAM_EMAIL;
     if (brevoKey && brevoEmail) {
+      const name    = body.customer_name    ?? body.name    ?? '';
+      const email   = body.customer_email   ?? body.email   ?? '';
+      const phone   = body.customer_phone   ?? body.phone   ?? '';
+      const address = body.delivery_address ?? body.address ?? '';
       const itemsList = (body.items ?? [])
         .map((i: { name: string; qty: number; price: number }) => `${i.name} ×${i.qty} — ₹${i.price}`)
         .join('<br>');
@@ -32,10 +36,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         method: 'POST',
         headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sender: { name: 'Kashmir Harvest', email: 'noreply@kashmirharvest.in' },
+          sender: { name: 'Kashmir Harvest', email: brevoEmail },
           to: [{ email: brevoEmail }],
-          subject: `New Order — ${body.name}`,
-          htmlContent: `<b>Customer:</b> ${body.name}<br><b>Email:</b> ${body.email}<br><b>Phone:</b> ${body.phone}<br><b>Address:</b> ${body.address}<br><br><b>Items:</b><br>${itemsList}<br><br><b>Total: ₹${body.total}</b>`,
+          subject: `New Order — ${name}`,
+          htmlContent: `<b>Customer:</b> ${name}<br><b>Email:</b> ${email}<br><b>Phone:</b> ${phone}<br><b>Address:</b> ${address}<br><br><b>Items:</b><br>${itemsList}<br><br><b>Total: ₹${body.total}</b>`,
         }),
       }).catch(() => null);
     }

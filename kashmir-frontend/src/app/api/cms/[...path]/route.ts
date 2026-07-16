@@ -82,7 +82,7 @@ async function orders(req: NextRequest, path: string[]): Promise<NextResponse> {
     if (status) q = q.eq('status', status);
     const { data, error } = await q;
     if (error) return NextResponse.json({ detail: error.message }, { status: 500 });
-    return NextResponse.json(data);
+    return NextResponse.json({ orders: data ?? [], total: data?.length ?? 0 });
   }
 
   if (req.method === 'GET' && id) {
