@@ -230,11 +230,22 @@ async function social(req: NextRequest, path: string[]): Promise<NextResponse> {
   const action  = path[2];
 
   if (req.method === 'GET' && segment === 'config') {
-    return NextResponse.json({
-      instagram: !!(process.env.INSTAGRAM_ACCESS_TOKEN && process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID),
-      facebook:  !!(process.env.FACEBOOK_ACCESS_TOKEN && process.env.FACEBOOK_PAGE_ID),
-      x: false,
-    });
+    const apiKey = process.env.AYRSHARE_API_KEY;
+    if (!apiKey) return NextResponse.json({ instagram: false, facebook: false, x: false });
+    try {
+      const r = await fetch('https://app.ayrshare.com/api/user', {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      const d = await r.json();
+      const active = (d.activeSocialAccounts ?? []) as string[];
+      return NextResponse.json({
+        instagram: active.includes('instagram'),
+        facebook:  active.includes('facebook'),
+        x:         active.includes('twitter'),
+      });
+    } catch {
+      return NextResponse.json({ instagram: false, facebook: false, x: false });
+    }
   }
 
   if (req.method === 'GET' && !segment) {
@@ -288,64 +299,52 @@ async function social(req: NextRequest, path: string[]): Promise<NextResponse> {
     const { data: post, error: fetchErr } = await db.from('social_posts').select('*').eq('id', segment).single();
     if (fetchErr) return NextResponse.json({ detail: 'Post not found' }, { status: 404 });
 
+    const apiKey = process.env.AYRSHARE_API_KEY;
+    if (!apiKey) return NextResponse.json({ detail: 'AYRSHARE_API_KEY not set' }, { status: 503 });
+
     const publishStatus: Record<string, { status: string; id?: string; error?: string | null }> = {};
     const results = { published: [] as string[], failed: [] as string[], skipped: [] as string[] };
 
-    for (const platform of (post.platforms as string[])) {
-      if (platform === 'instagram') {
-        const igToken     = process.env.INSTAGRAM_ACCESS_TOKEN;
-        const igAccountId = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
-        if (!igToken || !igAccountId || !post.media_url) {
-          publishStatus.instagram = { status: 'skipped', error: igToken ? 'No media URL' : 'Not configured' };
-          results.skipped.push('instagram'); continue;
-        }
-        try {
-          const cRes = await fetch(`https://graph.facebook.com/v18.0/${igAccountId}/media`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image_url: post.media_url, caption: post.caption ?? '', access_token: igToken }),
-          });
-          const container = await cRes.json();
-          if (!container.id) throw new Error(container.error?.message ?? 'Container failed');
-          const pRes = await fetch(`https://graph.facebook.com/v18.0/${igAccountId}/media_publish`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ creation_id: container.id, access_token: igToken }),
-          });
-          const pub = await pRes.json();
-          if (!pub.id) throw new Error(pub.error?.message ?? 'Publish failed');
-          publishStatus.instagram = { status: 'published', id: pub.id };
-          results.published.push('instagram');
-        } catch (e) {
-          publishStatus.instagram = { status: 'failed', error: String(e) };
-          results.failed.push('instagram');
+    try {
+      /* Ayrshare uses "twitter" for X */
+      const ayrPlatforms = (post.platforms as string[]).map((p: string) => p === 'x' ? 'twitter' : p);
+      const ayrBody: Record<string, unknown> = {
+        post:      post.caption ?? '',
+        platforms: ayrPlatforms,
+      };
+      if (post.media_url) ayrBody.mediaUrls = [post.media_url];
+
+      const r = await fetch('https://app.ayrshare.com/api/post', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(ayrBody),
+      });
+      const d = await r.json();
+
+      for (const pi of (d.postIds ?? [])) {
+        const key = (pi.platform as string) === 'twitter' ? 'x' : (pi.platform as string);
+        if (pi.status === 'success' || pi.id) {
+          publishStatus[key] = { status: 'published', id: String(pi.id ?? '') };
+          results.published.push(key);
+        } else {
+          const msg = (pi.errors?.[0]?.message ?? pi.message ?? 'Failed') as string;
+          publishStatus[key] = { status: 'failed', error: msg };
+          results.failed.push(key);
         }
       }
 
-      if (platform === 'facebook') {
-        const fbToken  = process.env.FACEBOOK_ACCESS_TOKEN;
-        const fbPageId = process.env.FACEBOOK_PAGE_ID;
-        if (!fbToken || !fbPageId) {
-          publishStatus.facebook = { status: 'skipped', error: 'Not configured' };
-          results.skipped.push('facebook'); continue;
+      /* If Ayrshare returned a top-level error (no postIds) */
+      if (!d.postIds && d.status === 'error') {
+        for (const plat of (post.platforms as string[])) {
+          publishStatus[plat] = { status: 'failed', error: d.message ?? 'Ayrshare error' };
+          results.failed.push(plat);
         }
-        try {
-          const endpoint = post.media_url
-            ? `https://graph.facebook.com/v18.0/${fbPageId}/photos`
-            : `https://graph.facebook.com/v18.0/${fbPageId}/feed`;
-          const fbBody = post.media_url
-            ? { url: post.media_url, caption: post.caption ?? '', access_token: fbToken }
-            : { message: post.caption ?? '', access_token: fbToken };
-          const fRes = await fetch(endpoint, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(fbBody),
-          });
-          const fb = await fRes.json();
-          if (!fb.id && !fb.post_id) throw new Error(fb.error?.message ?? 'Facebook publish failed');
-          publishStatus.facebook = { status: 'published', id: String(fb.id ?? fb.post_id) };
-          results.published.push('facebook');
-        } catch (e) {
-          publishStatus.facebook = { status: 'failed', error: String(e) };
-          results.failed.push('facebook');
-        }
+      }
+
+    } catch (e) {
+      for (const plat of (post.platforms as string[])) {
+        publishStatus[plat] = { status: 'failed', error: String(e) };
+        results.failed.push(plat);
       }
     }
 
