@@ -30,6 +30,10 @@ const spaceMono = Space_Mono({
 
 /* ── Metadata ──────────────────────────────────── */
 
+const ogImageUrl = CONFIG.seo.ogImage.startsWith('http')
+  ? CONFIG.seo.ogImage
+  : `${CONFIG.seo.siteUrl}${CONFIG.seo.ogImage}`;
+
 export const metadata: Metadata = {
   title: {
     default: CONFIG.film.title,
@@ -49,7 +53,7 @@ export const metadata: Metadata = {
     description: CONFIG.seo.defaultDescription,
     images: [
       {
-        url: CONFIG.seo.ogImage,
+        url: ogImageUrl,
         width: 1200,
         height: 630,
         alt: CONFIG.film.title,
@@ -60,7 +64,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: CONFIG.film.title,
     description: CONFIG.seo.defaultDescription,
-    images: [CONFIG.seo.ogImage],
+    images: [ogImageUrl],
   },
   robots: {
     index: true,
@@ -95,7 +99,7 @@ const jsonLd = {
   inLanguage: ['hi', 'en'],
   contentRating: FILM.certificate,
   url: CONFIG.seo.siteUrl,
-  image: CONFIG.seo.ogImage,
+  image: ogImageUrl,
 };
 
 /* ── Root Layout ───────────────────────────────── */
