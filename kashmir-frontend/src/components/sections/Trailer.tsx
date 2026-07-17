@@ -16,7 +16,7 @@ export default function Trailer() {
   const headRef     = useRef<HTMLDivElement>(null);
   const footRef     = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
-  const [showing, setShowing] = useState(false);
+  const [showing, setShowing] = useState(true);
 
   /* GSAP scroll entrance */
   useEffect(() => {
@@ -113,9 +113,9 @@ export default function Trailer() {
           ref={frameRef}
           style={{
             position: 'relative',
-            maxWidth: '520px',
+            maxWidth: '900px',
             margin: '0 auto',
-            aspectRatio: '5 / 7',
+            aspectRatio: '16 / 9',
             borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
             boxShadow: '0 40px 100px rgba(0,0,0,0.7)',
@@ -148,12 +148,13 @@ export default function Trailer() {
             <iframe
               src={
                 CONFIG.media.trailerUrl.includes('drive.google.com')
-                  ? CONFIG.media.trailerUrl
-                  : CONFIG.media.trailerUrl + '?autoplay=1&rel=0&modestbranding=1'
+                  ? CONFIG.media.trailerUrl + (CONFIG.media.trailerUrl.includes('?') ? '&mute=1' : '?mute=1')
+                  : CONFIG.media.trailerUrl + '?autoplay=1&mute=1&rel=0&modestbranding=1'
               }
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
               allow="autoplay; fullscreen"
               allowFullScreen
+              {...({ muted: true } as object)}
             />
           )}
 
