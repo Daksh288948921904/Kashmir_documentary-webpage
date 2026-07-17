@@ -13,7 +13,6 @@ export default function Trailer() {
   const sectionRef  = useRef<HTMLElement>(null);
   const frameRef    = useRef<HTMLDivElement>(null);
   const btnRef      = useRef<HTMLDivElement>(null);
-  const overlayRef  = useRef<HTMLDivElement>(null);
   const headRef     = useRef<HTMLDivElement>(null);
   const footRef     = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
@@ -114,13 +113,12 @@ export default function Trailer() {
           ref={frameRef}
           style={{
             position: 'relative',
-            maxWidth: '900px',
+            maxWidth: '520px',
             margin: '0 auto',
-            aspectRatio: '16 / 9',
+            aspectRatio: '5 / 7',
             borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
-            border: '1px solid rgba(201,123,43,0.25)',
-            boxShadow: '0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,123,43,0.08)',
+            boxShadow: '0 40px 100px rgba(0,0,0,0.7)',
             cursor: CONFIG.features.trailerAvailable ? 'none' : 'default',
           }}
           data-cursor-hover={CONFIG.features.trailerAvailable || undefined}
@@ -136,25 +134,14 @@ export default function Trailer() {
             priority={false}
             style={{
               objectFit: 'cover',
-              objectPosition: 'center 30%',
-              filter: `brightness(${hovered && CONFIG.features.trailerAvailable ? 0.45 : 0.28}) contrast(1.1) saturate(0.5)`,
+              objectPosition: 'center top',
+              filter: CONFIG.features.trailerAvailable
+                ? `brightness(${hovered ? 0.5 : 1})`
+                : 'brightness(1)',
               transition: 'filter 600ms ease',
             }}
           />
 
-          {/* Film grain overlay on frame */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'rgba(10,12,15,0.25)',
-            pointerEvents: 'none',
-          }} />
-
-          {/* Vignette */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(10,12,15,0.65) 100%)',
-            pointerEvents: 'none',
-          }} />
 
           {/* Active video embed */}
           {showing && CONFIG.features.trailerAvailable && CONFIG.media.trailerUrl && (
@@ -255,46 +242,6 @@ export default function Trailer() {
             </div>
           )}
 
-          {/* Bottom overlay — film details */}
-          <div
-            ref={overlayRef}
-            style={{
-              position: 'absolute',
-              bottom: 0, left: 0, right: 0,
-              padding: 'clamp(1rem, 3vw, 2rem) clamp(1rem, 3vw, 2rem)',
-              background: 'linear-gradient(to top, rgba(10,12,15,0.9) 0%, transparent 100%)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-end',
-            }}
-          >
-            <div>
-              <p style={{
-                fontFamily: 'var(--font-display)', fontStyle: 'italic',
-                fontSize: 'clamp(0.8rem, 1.2vw, 1rem)',
-                color: 'var(--color-snow-dim)',
-                marginBottom: '2px',
-              }}>
-                &ldquo;{FILM.tagline}&rdquo;
-              </p>
-              <span style={{
-                fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                letterSpacing: '0.20em', textTransform: 'uppercase',
-                color: 'var(--color-saffron-dim)',
-              }}>
-                {FILM.productionCompany} · {FILM.releaseYear}
-              </span>
-            </div>
-            <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-              letterSpacing: '0.20em', textTransform: 'uppercase',
-              color: 'var(--color-ash-text)',
-              textAlign: 'right',
-              lineHeight: 1.7,
-            }}>
-              <div>{FILM.genres[0]}</div>
-            </div>
-          </div>
         </div>
 
         {/* Footer text */}
