@@ -133,42 +133,22 @@ export default function FilmOverview() {
           </p>
 
           <div style={{
-            position: 'relative', width: '210px', margin: '0 auto',
+            position: 'relative', width: '360px', maxWidth: '90vw', margin: '0 auto',
             borderRadius: 'var(--radius-sm)', overflow: 'hidden',
-            boxShadow: '0 0 60px rgba(201,123,43,0.12)',
+            boxShadow: '0 40px 100px rgba(0,0,0,0.6)',
           }}>
             <Image
               src={CONFIG.sectionImages.poster}
               alt={`${FILM.title} — film poster`}
-              width={210}
-              height={315}
+              width={360}
+              height={504}
               style={{
-                width: '100%', height: 'auto', aspectRatio: '2/3',
+                width: '100%', height: 'auto', aspectRatio: '5/7',
                 objectFit: 'cover', objectPosition: 'center top',
-                filter: 'brightness(0.58) contrast(1.05) saturate(0.65)',
+                filter: 'brightness(1)',
                 display: 'block',
               }}
             />
-            <div style={{
-              position: 'absolute', inset: 0, pointerEvents: 'none',
-              background: 'linear-gradient(to top, rgba(6,8,11,0.95) 0%, rgba(6,8,11,0.18) 55%, transparent 100%)',
-            }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1rem 0.9rem' }}>
-              <div style={{
-                fontFamily: 'var(--font-display)', fontStyle: 'italic',
-                fontSize: '11.5px', color: 'var(--color-snow)',
-                lineHeight: 1.35, marginBottom: '4px',
-              }}>
-                {FILM.title}
-              </div>
-              <div style={{
-                fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
-                letterSpacing: '0.20em', textTransform: 'uppercase',
-                color: 'var(--color-saffron)',
-              }}>
-                {FILM.director} · {FILM.releaseYear}
-              </div>
-            </div>
           </div>
         </div>
 

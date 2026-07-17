@@ -52,8 +52,7 @@ export const CONFIG = {
 
   /* ── Media ───────────────────────────── */
   media: {
-    /* Trailer URL — empty = coming soon state */
-    trailerUrl: process.env.NEXT_PUBLIC_TRAILER_URL ?? '',
+    trailerUrl: process.env.NEXT_PUBLIC_TRAILER_URL ?? 'https://drive.google.com/file/d/1Qsl_BWfq9hNnXqBkknqQoja_c_M4vgK1/preview',
     /* Full film URL — empty = requires payment */
     filmUrl: process.env.NEXT_PUBLIC_FILM_URL ?? '',
     posterUrl: process.env.NEXT_PUBLIC_POSTER_URL ?? '/poster.jpg',
@@ -77,7 +76,7 @@ export const CONFIG = {
 
   /* ── Features / Coming Soon Toggles ──── */
   features: {
-    trailerAvailable: false,
+    trailerAvailable: true,
     filmAvailable: true,
     paymentEnabled: true,
     socialFeedEnabled: true,

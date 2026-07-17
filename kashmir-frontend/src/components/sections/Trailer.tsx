@@ -146,7 +146,11 @@ export default function Trailer() {
           {/* Active video embed */}
           {showing && CONFIG.features.trailerAvailable && CONFIG.media.trailerUrl && (
             <iframe
-              src={CONFIG.media.trailerUrl + '?autoplay=1&rel=0&modestbranding=1'}
+              src={
+                CONFIG.media.trailerUrl.includes('drive.google.com')
+                  ? CONFIG.media.trailerUrl
+                  : CONFIG.media.trailerUrl + '?autoplay=1&rel=0&modestbranding=1'
+              }
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
               allow="autoplay; fullscreen"
               allowFullScreen
