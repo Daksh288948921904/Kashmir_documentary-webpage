@@ -72,7 +72,7 @@ export const CONFIG = {
   /* ── Section Images (used in Film Overview, Duality, etc.) ── */
   sectionImages: {
     /* Kashmir valley for Film/Overview section poster */
-    poster: 'https://images.pexels.com/photos/8303558/pexels-photo-8303558.jpeg?auto=compress&cs=tinysrgb&w=800&q=85',
+    poster: '/poster.jpg',
   },
 
   /* ── Features / Coming Soon Toggles ──── */
