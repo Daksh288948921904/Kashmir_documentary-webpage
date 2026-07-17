@@ -56,8 +56,7 @@ export const CONFIG = {
     trailerUrl: process.env.NEXT_PUBLIC_TRAILER_URL ?? '',
     /* Full film URL — empty = requires payment */
     filmUrl: process.env.NEXT_PUBLIC_FILM_URL ?? '',
-    /* Poster placeholder (Pexels Kashmir — swap for production still) */
-    posterUrl: 'https://images.pexels.com/photos/8303558/pexels-photo-8303558.jpeg?auto=compress&cs=tinysrgb&w=800&q=85',
+    posterUrl: process.env.NEXT_PUBLIC_POSTER_URL ?? '/poster.jpg',
   },
 
   /* ── Hero Images (Pexels Kashmir placeholders — swap for production stills) ── */
@@ -125,8 +124,7 @@ export const CONFIG = {
       'A documentary about ordinary people living in extraordinary circumstances. Kashmir — Fighting for Peace by Rig 360 Media.',
     // REQUIRED BEFORE DEPLOYMENT: add your own /public/og-image.jpg and set NEXT_PUBLIC_OG_IMAGE_URL=https://yourdomain.com/og-image.jpg
     // Without a self-hosted image, broken Pexels URLs will break every social share preview.
-    ogImage: process.env.NEXT_PUBLIC_OG_IMAGE_URL
-      ?? 'https://images.pexels.com/photos/14651212/pexels-photo-14651212.jpeg?auto=compress&cs=tinysrgb&w=1200&q=85',
+    ogImage: process.env.NEXT_PUBLIC_OG_IMAGE_URL ?? '/poster.jpg',
   },
 } as const;
 
