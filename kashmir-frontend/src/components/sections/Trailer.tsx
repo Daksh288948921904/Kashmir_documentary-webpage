@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Trailer() {
   const sectionRef  = useRef<HTMLElement>(null);
   const frameRef    = useRef<HTMLDivElement>(null);
-  const btnRef      = useRef<HTMLDivElement>(null);
+  const btnRef      = CONFIG.features.trailerAvailable ? useRef<HTMLDivElement>(null) : { current: null };
   const headRef     = useRef<HTMLDivElement>(null);
   const footRef     = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
@@ -153,8 +153,8 @@ export default function Trailer() {
             />
           )}
 
-          {/* Play button — magnetic, centered */}
-          {!showing && (
+          {/* Play button — only shown when trailer is available */}
+          {!showing && CONFIG.features.trailerAvailable && (
             <div
               ref={btnRef}
               onMouseEnter={() => setHovered(true)}
@@ -170,74 +170,22 @@ export default function Trailer() {
                 userSelect: 'none',
               }}
             >
-              {/* Outer pulse ring (coming soon only) */}
-              {!CONFIG.features.trailerAvailable && (
-                <div
-                  className="pulse-ring"
-                  style={{
-                    position: 'absolute',
-                    width: '96px', height: '96px',
-                    borderRadius: '50%',
-                    border: '1px solid rgba(201,123,43,0.4)',
-                    pointerEvents: 'none',
-                    top: '50%', left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                />
-              )}
-
-              {/* Button circle */}
               <div style={{
                 width: '80px', height: '80px',
                 borderRadius: '50%',
-                backgroundColor: CONFIG.features.trailerAvailable
-                  ? (hovered ? 'rgba(201,123,43,0.25)' : 'rgba(10,12,15,0.7)')
-                  : 'rgba(10,12,15,0.65)',
-                border: `1.5px solid ${hovered && CONFIG.features.trailerAvailable ? 'rgba(201,123,43,0.9)' : 'rgba(201,123,43,0.45)'}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                backgroundColor: hovered ? 'rgba(201,123,43,0.25)' : 'rgba(10,12,15,0.7)',
+                border: `1.5px solid ${hovered ? 'rgba(201,123,43,0.9)' : 'rgba(201,123,43,0.45)'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
                 backdropFilter: 'blur(8px)',
-                transition: 'background-color 400ms, border-color 400ms, box-shadow 400ms',
-                boxShadow: hovered && CONFIG.features.trailerAvailable
-                  ? '0 0 40px rgba(201,123,43,0.25), inset 0 0 20px rgba(201,123,43,0.1)'
-                  : '0 0 20px rgba(0,0,0,0.5)',
+                transition: 'background-color 400ms, border-color 400ms',
+                boxShadow: hovered ? '0 0 40px rgba(201,123,43,0.25)' : '0 0 20px rgba(0,0,0,0.5)',
               }}>
-                {CONFIG.features.trailerAvailable ? (
-                  /* Play triangle */
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <polygon
-                      points="8,5 20,12 8,19"
-                      fill={hovered ? 'rgba(201,123,43,1)' : 'rgba(201,123,43,0.7)'}
-                      style={{ transition: 'fill 300ms' }}
-                    />
-                  </svg>
-                ) : (
-                  /* Coming soon: film reel icon */
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" opacity="0.7">
-                    <circle cx="12" cy="12" r="10" stroke="rgba(201,123,43,0.6)" strokeWidth="1.5"/>
-                    <circle cx="12" cy="12" r="3" fill="rgba(201,123,43,0.5)"/>
-                    <circle cx="7" cy="7" r="1.5" fill="rgba(201,123,43,0.4)"/>
-                    <circle cx="17" cy="7" r="1.5" fill="rgba(201,123,43,0.4)"/>
-                    <circle cx="7" cy="17" r="1.5" fill="rgba(201,123,43,0.4)"/>
-                    <circle cx="17" cy="17" r="1.5" fill="rgba(201,123,43,0.4)"/>
-                  </svg>
-                )}
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <polygon points="8,5 20,12 8,19" fill={hovered ? 'rgba(201,123,43,1)' : 'rgba(201,123,43,0.7)'} style={{ transition: 'fill 300ms' }} />
+                </svg>
               </div>
-
-              {/* Label below button */}
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 'var(--text-xs)',
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-                color: CONFIG.features.trailerAvailable
-                  ? (hovered ? 'rgba(201,123,43,1)' : 'rgba(245,240,232,0.6)')
-                  : 'rgba(201,123,43,0.55)',
-                transition: 'color 300ms',
-                whiteSpace: 'nowrap',
-              }}>
-                {CONFIG.features.trailerAvailable ? 'Play Trailer' : 'Trailer · In Production'}
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', letterSpacing: '0.22em', textTransform: 'uppercase', color: hovered ? 'rgba(201,123,43,1)' : 'rgba(245,240,232,0.6)', transition: 'color 300ms', whiteSpace: 'nowrap' }}>
+                Play Trailer
               </span>
             </div>
           )}
