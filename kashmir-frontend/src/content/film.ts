@@ -64,7 +64,7 @@ export const FILM = {
   ],
 
   /* ── Primary pull quote ─── */
-  primaryPullQuote: 'It is not what they are. The conflict is something that happened to them.',
+  primaryPullQuote: 'This conflict happens at intersection of territory, religion and language divide.',
 
   /* ── Chapter Timestamps ─────────────
      These OVERRIDE the backend's get_documentary_timestamps().

@@ -222,14 +222,14 @@ export default function FilmOverview() {
                   letterSpacing: '0.20em', textTransform: 'uppercase',
                   color: 'var(--color-saffron)', marginBottom: '4px',
                 }}>
-                  Director
+                  Director and Producer
                 </div>
                 <div style={{
                   fontFamily: 'var(--font-body)',
                   fontSize: 'var(--text-base)',
                   color: 'var(--color-snow)', fontWeight: 500,
                 }}>
-                  {FILM.director}
+                  Rohit Gandhi
                 </div>
               </div>
 
