@@ -230,6 +230,7 @@ export default function Hero() {
 
   // ─── Main RAF: tilt + parallax + mask + glow ──────────────────────────────
   useEffect(() => {
+    if (window.innerWidth < 768) return; // skip mouse/tilt effects on mobile
     const onMove = (e: MouseEvent) => {
       mouse.current.x = (e.clientX / window.innerWidth  - 0.5) * 2;
       mouse.current.y = (e.clientY / window.innerHeight - 0.5) * 2;

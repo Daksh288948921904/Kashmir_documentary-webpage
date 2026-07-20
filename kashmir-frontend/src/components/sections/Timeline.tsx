@@ -611,7 +611,7 @@ export default function Timeline() {
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+          <div className="timeline-filter-bar" style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
             {(['all', 'political', 'conflict', 'cultural', 'humanitarian'] as Filter[]).map(f => {
               const on = filter === f;
               const color = f === 'all' ? 'var(--color-saffron)' : CAT[f]?.color ?? 'var(--color-saffron)';
@@ -644,7 +644,7 @@ export default function Timeline() {
         </div>
 
         {/* ── Body grid ── */}
-        <div style={{
+        <div className="timeline-body-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'clamp(150px, 15vw, 200px) 1fr',
           gap: '0 2.5rem',
@@ -652,7 +652,7 @@ export default function Timeline() {
         }}>
 
           {/* ── Left sticky nav ── */}
-          <div style={{ position: 'sticky', top: '5rem' }}>
+          <div className="timeline-era-nav" style={{ position: 'sticky', top: '5rem' }}>
             <div style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.56rem',
