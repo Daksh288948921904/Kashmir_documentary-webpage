@@ -26,10 +26,8 @@ interface Firefly {
 
 const BLOB_DEFS: Blob[] = [
   { x: 0.15, y: 0.20, vx:  0.00008, vy:  0.00005, r: 0.42, opacity: 0.045, warm: true  },
-  { x: 0.70, y: 0.10, vx: -0.00006, vy:  0.00009, r: 0.36, opacity: 0.030, warm: false },
   { x: 0.50, y: 0.55, vx:  0.00010, vy: -0.00004, r: 0.48, opacity: 0.038, warm: true  },
   { x: 0.85, y: 0.75, vx: -0.00008, vy: -0.00006, r: 0.34, opacity: 0.025, warm: false },
-  { x: 0.30, y: 0.88, vx:  0.00005, vy: -0.00008, r: 0.40, opacity: 0.032, warm: true  },
 ];
 
 // Grid-jitter: one fly per cell so they spread evenly, never cluster
@@ -222,12 +220,13 @@ function drawFireflies(
 }
 
 export default function AtmosphereCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef    = useRef<number>(0);
-  const blobsRef  = useRef<Blob[]>(BLOB_DEFS.map(b => ({ ...b })));
-  const fliesRef  = useRef<Firefly[]>([]);
-  const mouseRef  = useRef<{ x: number; y: number }>({ x: -1, y: -1 });
-  const timeRef   = useRef<number>(0);
+  const canvasRef   = useRef<HTMLCanvasElement>(null);
+  const rafRef      = useRef<number>(0);
+  const blobsRef    = useRef<Blob[]>(BLOB_DEFS.map(b => ({ ...b })));
+  const fliesRef    = useRef<Firefly[]>([]);
+  const mouseRef    = useRef<{ x: number; y: number }>({ x: -1, y: -1 });
+  const timeRef     = useRef<number>(0);
+  const lastTickRef = useRef<number>(0);
 
   useEffect(() => {
     if (!CONFIG.effects.atmosphereEnabled) return;
@@ -241,7 +240,9 @@ export default function AtmosphereCanvas() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile     = window.innerWidth < 768;
 
-    fliesRef.current = makeFireflies(isMobile ? 10 : 22);
+    fliesRef.current = CONFIG.effects.atmosphereNoiseEnabled
+      ? makeFireflies(isMobile ? 6 : 10)
+      : [];
 
     function setSize() {
       if (!canvas) return;
@@ -249,8 +250,12 @@ export default function AtmosphereCanvas() {
       canvas.height = window.innerHeight;
     }
 
-    function loop() {
+    function loop(now: number) {
       if (!canvas) return;
+      rafRef.current = requestAnimationFrame(loop);
+      if (now - lastTickRef.current < 33) return; // ~30fps cap
+      lastTickRef.current = now;
+
       timeRef.current += 0.012;
       const t = timeRef.current;
       const W = canvas.width;
@@ -261,9 +266,7 @@ export default function AtmosphereCanvas() {
       drawBlobs(ctx, W, H, blobsRef.current);
       drawValleyGlow(ctx, W, H);
       drawChinars(ctx, W, H);
-      drawFireflies(ctx, W, H, t, fliesRef.current, mx, my);
-
-      rafRef.current = requestAnimationFrame(loop);
+      if (fliesRef.current.length > 0) drawFireflies(ctx, W, H, t, fliesRef.current, mx, my);
     }
 
     setSize();

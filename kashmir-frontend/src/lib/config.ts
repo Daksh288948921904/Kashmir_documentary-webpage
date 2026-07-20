@@ -86,7 +86,7 @@ export const CONFIG = {
 
   /* ── Effects Flags ───────────────────── */
   effects: {
-    grainEnabled: true,
+    grainEnabled: false,
     cursorEnabled: false,
     cursorLightEnabled: false,
     smoothScrollEnabled: true,
@@ -95,7 +95,7 @@ export const CONFIG = {
     webglDualityEnabled: false,
     /* Atmosphere background system */
     atmosphereEnabled: true,
-    atmosphereNoiseEnabled: true,
+    atmosphereNoiseEnabled: false,
   },
 
   /* ── Social Links ────────────────────── */
