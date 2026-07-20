@@ -19,7 +19,7 @@ const BEAUTY_IMAGES = [
 ];
 
 // ─── Montage images ────────────────────────────────────────────────────────────
-const MONTAGE_IMAGES = [
+const MONTAGE_IMAGES_ALL = [
   '/montage/montage-01.png',
   '/montage/montage-02.png',
   '/montage/montage-03.png',
@@ -53,6 +53,11 @@ const MONTAGE_IMAGES = [
   '/montage/montage-31.png',
   '/montage/montage-32.png',
 ];
+// On mobile load only 8 images to reduce network + memory pressure
+const isMobileDevice = typeof window !== 'undefined' && window.innerWidth < 768;
+const MONTAGE_IMAGES = isMobileDevice
+  ? MONTAGE_IMAGES_ALL.filter((_, i) => i % 4 === 0)
+  : MONTAGE_IMAGES_ALL;
 
 // ─── Three-panel text (replace with final copy) ───────────────────────────────
 const PANEL_LEFT = {

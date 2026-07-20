@@ -240,8 +240,10 @@ export default function AtmosphereCanvas() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile     = window.innerWidth < 768;
 
+    if (isMobile) return; // skip canvas entirely on mobile
+
     fliesRef.current = CONFIG.effects.atmosphereNoiseEnabled
-      ? makeFireflies(isMobile ? 6 : 10)
+      ? makeFireflies(10)
       : [];
 
     function setSize() {

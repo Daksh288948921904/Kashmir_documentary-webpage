@@ -105,7 +105,7 @@ export default function Nav() {
           <a
             href={isShop ? '/' : '#'}
             onClick={e => { if (isShop) return; e.preventDefault(); scrollTo('#hero'); }}
-            className="font-mono uppercase text-snow hover:text-saffron transition-colors duration-200 shrink-0"
+            className="nav-brand font-mono uppercase text-snow hover:text-saffron transition-colors duration-200 shrink-0"
             style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', color: 'var(--color-snow)', letterSpacing: '0.22em', fontWeight: 500 }}
           >
             KASHMIR&nbsp;—&nbsp;FIGHTING FOR PEACE
