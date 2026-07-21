@@ -250,7 +250,7 @@ export default function Duality() {
   const isMobileGallery = typeof window !== 'undefined' && window.innerWidth < 768;
 
   /* ── Stable function refs (latest version available to effects) ── */
-  const activateRef = useRef<(idx: number) => void>(() => {});
+  const activateRef = useRef<(idx: number, instant?: boolean) => void>(() => {});
   const advanceRef  = useRef<(next: number) => void>(() => {});
   const exitTrigRef = useRef<() => void>(() => {});
 
@@ -407,7 +407,7 @@ export default function Duality() {
      activateWitness — bloom portrait, run testimony timer chain
      Reassigned every render so it always has fresh closures.
   ───────────────────────────────────────────────────────────────── */
-  activateRef.current = function activateWitness(idx: number) {
+  activateRef.current = function activateWitness(idx: number, instant = false) {
     lockRef.current = true;
     clearAllTimers();
     stopRippleInterval();
@@ -418,7 +418,14 @@ export default function Duality() {
     setLocWarmth(0);
 
     const w = WITNESSES[idx];
-    bloomPortrait(w.revealMs);
+    if (instant) {
+      // Portrait already covered by blackout — open curtain immediately so it's
+      // fully visible the moment fastReveal clears the blackout overlay.
+      const curtain = curtainRef.current;
+      if (curtain) { curtain.style.transition = 'none'; curtain.style.opacity = '0'; }
+    } else {
+      bloomPortrait(w.revealMs);
+    }
 
     // Testimony reveal chain
     scheduleTimer(600,  () => { setStep(1); setLocWarmth(1); });
@@ -483,21 +490,12 @@ export default function Duality() {
     stopRippleInterval();
     setStep(0);
 
-    // fastBlack: instant black (overrides any ongoing fade), then snap under cover
+    // Black flash covers the swap; portrait curtain opens instantly so the photo
+    // is fully visible the moment the blackout fades — no slow bloom delay.
     fastBlack(() => {
-      const wrapper = wrapperRef.current;
-      if (wrapper) {
-        // For the last witness, snap 0.5vh back from the sticky-release boundary so
-        // that momentum scroll events after the transition don't immediately exit sticky.
-        // (At exactly next*vh the wrapper bottom == viewport bottom — any further scroll exits.)
-        const offset = next === WITNESSES.length - 1 ? next - 0.5 : next;
-        const targetY = wrapper.offsetTop + offset * window.innerHeight;
-        // Lenis is stopped while the section is pinned — use window.scrollTo directly.
-        window.scrollTo({ top: targetY, behavior: 'instant' });
-      }
       scheduleTimer(80, () => {
         fastReveal();
-        activateRef.current(next);
+        activateRef.current(next, true);
       });
     });
   };
