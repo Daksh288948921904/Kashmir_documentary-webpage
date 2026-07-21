@@ -21,8 +21,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   scroll-behavior: auto;
-  overflow-x: hidden;
-  max-width: 100vw;
+  /* clip clips overflow without creating a scroll container — safe for position:sticky */
+  overflow-x: clip;
 }
 
 

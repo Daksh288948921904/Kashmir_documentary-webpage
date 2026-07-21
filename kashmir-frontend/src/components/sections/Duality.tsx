@@ -542,7 +542,7 @@ export default function Duality() {
           reviewSelectedRef.current = null;
           sectionPassedRef.current = true;
         }
-      }, 2500);
+      }, 800);
     });
   };
 
@@ -593,6 +593,11 @@ export default function Duality() {
       setExitPhase(4);
       setStep(0);
       sectionPassedRef.current = true;
+      // Show gallery immediately so the section doesn't render as an empty black screen
+      reviewModeRef.current = true;
+      setReviewMode(true);
+      setReviewSelected(null);
+      reviewSelectedRef.current = null;
       leavingUpward = true;
       fastBlack(() => {
         // Past sticky-release point: wrapper.bottom - vh + 21 → isStuck()=false immediately
@@ -724,7 +729,7 @@ export default function Duality() {
                 reviewSelectedRef.current = null;
                 sectionPassedRef.current = true;
               }
-            }, 1500);
+            }, 600);
           }
           e.preventDefault();
           return;
@@ -1394,13 +1399,16 @@ export default function Duality() {
               gap: '2.75rem',
             }}
           >
-            {/* Phase 0–1: 7-portrait strip */}
+            {/* Phase 0–1: 7-portrait strip (hidden from phase 2+ to avoid layout gap) */}
             <div
               style={{
                 display: 'flex',
                 gap: '6px',
                 opacity: exitPhase <= 1 ? 1 : 0,
                 transition: 'opacity 1.1s ease',
+                visibility: exitPhase >= 2 ? 'hidden' : 'visible',
+                height: exitPhase >= 2 ? 0 : undefined,
+                overflow: 'hidden',
               }}
             >
               {WITNESSES.map((wd, i) => (
