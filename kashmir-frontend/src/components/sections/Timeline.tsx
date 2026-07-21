@@ -69,10 +69,11 @@ function DocPanel({ doc, onClose }: { doc: TimelineDoc; onClose: () => void }) {
   return (
     <div style={{
       marginTop: '1.25rem',
-      background: 'rgba(201,144,26,0.05)',
-      border: '1px solid rgba(201,144,26,0.22)',
+      background: 'rgba(201,144,26,0.07)',
+      border: '1px solid rgba(201,144,26,0.35)',
       borderRadius: '8px',
       overflow: 'hidden',
+      boxShadow: '0 0 24px rgba(201,144,26,0.08)',
     }}>
       {/* Doc header bar */}
       <div style={{
@@ -80,8 +81,8 @@ function DocPanel({ doc, onClose }: { doc: TimelineDoc; onClose: () => void }) {
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '0.65rem 1rem',
-        background: 'rgba(201,144,26,0.08)',
-        borderBottom: '1px solid rgba(201,144,26,0.15)',
+        background: 'rgba(201,144,26,0.12)',
+        borderBottom: '1px solid rgba(201,144,26,0.25)',
       }}>
         <div style={{
           fontFamily: 'var(--font-mono)',
@@ -117,7 +118,7 @@ function DocPanel({ doc, onClose }: { doc: TimelineDoc; onClose: () => void }) {
           fontFamily: 'var(--font-mono)',
           fontSize: '0.62rem',
           letterSpacing: '0.07em',
-          color: 'var(--color-ash-text)',
+          color: 'rgba(201,144,26,0.75)',
           marginBottom: '0.875rem',
         }}>
           {doc.date} · {doc.source}
@@ -204,39 +205,51 @@ function EventCard({
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.78rem',
+          fontSize: '0.88rem',
           fontWeight: 700,
           color: accent,
           letterSpacing: '0.03em',
           textAlign: 'center',
-          marginBottom: '0.5rem',
           paddingTop: '0.85rem',
           lineHeight: 1,
+          textShadow: `0 0 14px ${accent}80`,
         }}>
           {event.year}
         </div>
+        {/* Timeline node dot */}
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          background: accent,
+          boxShadow: `0 0 8px ${accent}CC, 0 0 18px ${accent}50`,
+          margin: '0.45rem 0 0',
+          flexShrink: 0,
+        }} />
         {!isLast && (
           <div style={{
-            width: '1px',
+            width: '2px',
             flexGrow: 1,
-            minHeight: '20px',
-            background: `linear-gradient(to bottom, ${accent}45 0%, ${accent}08 100%)`,
+            minHeight: '24px',
+            background: `linear-gradient(to bottom, ${accent}70 0%, ${accent}12 100%)`,
+            marginTop: '0.2rem',
+            borderRadius: '1px',
           }} />
         )}
       </div>
 
       {/* Card */}
       <div style={{
-        background: 'rgba(255,255,255,0.022)',
-        border: '1px solid rgba(255,255,255,0.065)',
+        background: 'rgba(255,255,255,0.042)',
+        border: '1px solid rgba(255,255,255,0.11)',
         borderLeft: `3px solid ${cat.color}`,
         borderRadius: '8px',
         padding: '0.9rem 1.1rem',
-        transition: 'background 0.2s',
+        transition: 'background 0.2s, box-shadow 0.2s',
         cursor: 'default',
       }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.038)'; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.022)'; }}
+        onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(255,255,255,0.065)'; el.style.boxShadow = `0 0 0 1px ${cat.color}40`; }}
+        onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(255,255,255,0.042)'; el.style.boxShadow = 'none'; }}
       >
         {/* Title row */}
         <div style={{
@@ -279,7 +292,7 @@ function EventCard({
             fontFamily: 'var(--font-mono)',
             fontSize: '0.6rem',
             letterSpacing: '0.1em',
-            color: 'rgba(255,255,255,0.3)',
+            color: 'rgba(255,255,255,0.48)',
             marginBottom: '0.65rem',
           }}>
             ◦ {event.place}
@@ -324,14 +337,21 @@ function EventCard({
             <button
               onClick={() => { setExpanded(true); setShowDoc(v => !v); }}
               style={{
-                background: 'none', border: 'none', padding: 0,
-                fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0.28rem 0.65rem',
+                background: showDoc ? 'rgba(201,144,26,0.2)' : 'rgba(201,144,26,0.09)',
+                border: `1px solid ${showDoc ? 'rgba(201,144,26,0.6)' : 'rgba(201,144,26,0.32)'}`,
+                borderRadius: '4px',
+                fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
                 letterSpacing: '0.12em', textTransform: 'uppercase',
-                color: showDoc ? '#C9901A' : 'rgba(201,144,26,0.55)',
-                cursor: 'pointer', transition: 'color 0.15s',
+                color: showDoc ? '#C9901A' : 'rgba(201,144,26,0.85)',
+                cursor: 'pointer', transition: 'all 0.15s',
+                boxShadow: showDoc ? '0 0 12px rgba(201,144,26,0.25)' : 'none',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#C9901A'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = showDoc ? '#C9901A' : 'rgba(201,144,26,0.55)'; }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'rgba(201,144,26,0.18)'; el.style.borderColor = 'rgba(201,144,26,0.55)'; el.style.color = '#C9901A'; el.style.boxShadow = '0 0 10px rgba(201,144,26,0.2)'; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = showDoc ? 'rgba(201,144,26,0.2)' : 'rgba(201,144,26,0.09)'; el.style.borderColor = showDoc ? 'rgba(201,144,26,0.6)' : 'rgba(201,144,26,0.32)'; el.style.color = showDoc ? '#C9901A' : 'rgba(201,144,26,0.85)'; el.style.boxShadow = showDoc ? '0 0 12px rgba(201,144,26,0.25)' : 'none'; }}
             >
               📄 {showDoc ? 'Hide source' : 'Primary source'}
             </button>
@@ -384,27 +404,30 @@ function EraHeader({ era, count }: { era: typeof ERAS[number]; count: number }) 
         <span style={{
           fontFamily: 'var(--font-display)',
           fontSize: 'clamp(3rem, 6vw, 5rem)',
-          color: `${era.accent}18`,
+          color: `${era.accent}35`,
           lineHeight: 1,
           fontWeight: 700,
           letterSpacing: '-0.02em',
           userSelect: 'none',
+          textShadow: `0 0 40px ${era.accent}25`,
         }}>
           {era.num}
         </span>
         <div style={{
-          height: '1px',
+          height: '2px',
           flexGrow: 1,
-          background: `linear-gradient(to right, ${era.accent}60, transparent)`,
+          background: `linear-gradient(to right, ${era.accent}A0, ${era.accent}25, transparent)`,
+          borderRadius: '1px',
         }} />
       </div>
 
       <div style={{
         padding: '1.25rem 1.5rem',
-        background: `${era.accent}08`,
-        border: `1px solid ${era.accent}1A`,
+        background: `${era.accent}0E`,
+        border: `1px solid ${era.accent}30`,
         borderLeft: `4px solid ${era.accent}`,
         borderRadius: '0 8px 8px 0',
+        boxShadow: `inset 4px 0 28px ${era.accent}0C`,
       }}>
         <div style={{
           fontFamily: 'var(--font-mono)',
@@ -413,7 +436,7 @@ function EraHeader({ era, count }: { era: typeof ERAS[number]; count: number }) 
           textTransform: 'uppercase',
           color: era.accent,
           marginBottom: '0.4rem',
-          opacity: 0.85,
+          textShadow: `0 0 10px ${era.accent}60`,
         }}>
           {era.range} · {count} event{count !== 1 ? 's' : ''}
         </div>
@@ -431,7 +454,7 @@ function EraHeader({ era, count }: { era: typeof ERAS[number]; count: number }) 
           fontFamily: 'var(--font-display)',
           fontStyle: 'italic',
           fontSize: 'clamp(0.875rem, 1.4vw, 0.975rem)',
-          color: 'rgba(255,255,255,0.45)',
+          color: 'rgba(255,255,255,0.58)',
           lineHeight: 1.6,
           margin: 0,
         }}>
@@ -679,13 +702,14 @@ export default function Timeline() {
                       width: '100%',
                       textAlign: 'left',
                       border: 'none',
-                      background: on ? `${era.accent}10` : 'none',
+                      background: on ? `${era.accent}18` : 'none',
                       padding: '0.5rem 0.75rem',
                       borderLeft: `2px solid ${on ? era.accent : 'rgba(255,255,255,0.07)'}`,
                       borderRadius: '0 5px 5px 0',
                       marginBottom: '2px',
                       cursor: 'pointer',
                       transition: 'all 0.2s',
+                      boxShadow: on ? `inset 2px 0 10px ${era.accent}20` : 'none',
                     }}
                   >
                     <div style={{
@@ -747,15 +771,16 @@ export default function Timeline() {
                   paddingLeft: '0.1rem',
                 }}>
                   <div style={{
-                    width: '12px', height: '2px',
-                    borderRadius: '1px',
+                    width: '8px', height: '8px',
+                    borderRadius: '50%',
                     background: color,
+                    boxShadow: `0 0 6px ${color}90`,
                     flexShrink: 0,
                   }} />
                   <span style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.6rem',
-                    color: 'rgba(255,255,255,0.3)',
+                    color: 'rgba(255,255,255,0.5)',
                   }}>
                     {label}
                   </span>
