@@ -643,6 +643,10 @@ export default function Duality() {
     function handleWheel(e: WheelEvent) {
       if (!isStuck()) return;
 
+      // Prevent Lenis (registered before this handler) from scrolling
+      // the page while the section is pinned.
+      e.preventDefault();
+
       const dir = e.deltaY > 25 ? 1 : e.deltaY < -25 ? -1 : 0;
       if (dir === 0) return;
 
@@ -860,12 +864,15 @@ export default function Duality() {
       handleWheel({ deltaY: dy > 0 ? 80 : -80, preventDefault() {} } as WheelEvent);
     }
 
-    window.addEventListener('wheel', handleWheel, { passive: false });
+    // capture:true fires our handler BEFORE Lenis (which uses non-capture),
+    // so e.preventDefault() actually prevents Lenis from scrolling the page
+    // while the section is active.
+    window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchend',   onTouchEnd,   { passive: true });
 
     return () => {
-      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('wheel', handleWheel, { capture: true });
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchend', onTouchEnd);
       ro.disconnect();
