@@ -246,6 +246,7 @@ export default function Duality() {
   const [reviewMode,    setReviewMode]    = useState(false);
   const [reviewSelected,setReviewSelected]= useState<number | null>(null);
   const [galleryHover,  setGalleryHover]  = useState<number | null>(null);
+  const isMobileGallery = typeof window !== 'undefined' && window.innerWidth < 768;
 
   /* ── Stable function refs (latest version available to effects) ── */
   const activateRef = useRef<(idx: number) => void>(() => {});
@@ -1506,148 +1507,147 @@ export default function Duality() {
 
         {/* ══════════════════ GALLERY (re-entry) ══════════════════ */}
         {reviewMode && reviewSelected === null && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 20,
-              backgroundColor: 'rgba(4,5,7,0.97)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '2rem',
-              animation: 'duality-fade-in 0.6s ease forwards',
-            }}
-          >
-            <p
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 'var(--text-xs)',
-                letterSpacing: '0.20em',
-                textTransform: 'uppercase',
-                color: 'var(--color-saffron)',
-                opacity: 0.7,
-                marginBottom: '0.75rem',
-              }}
-            >
-              Nine Witnesses
-            </p>
-            <h2
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontStyle: 'italic',
-                fontSize: 'clamp(1.5rem, 3vw, 2.2rem)',
-                fontWeight: 400,
-                color: 'var(--color-snow)',
-                marginBottom: '0.5rem',
-                textAlign: 'center',
-              }}
-            >
-              Revisit a voice
-            </h2>
-            <p
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 'var(--text-xs)',
-                letterSpacing: '0.20em',
-                color: 'rgba(230,220,197,0.3)',
-                marginBottom: '2.5rem',
-              }}
-            >
-              scroll ↓ to continue
-            </p>
-
-            {/* 9 witnesses — 3×3 CSS grid, labels constrained to thumbnail width */}
+          isMobileGallery ? (
+            /* ── Mobile: compact 3×3 grid centered ── */
             <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, clamp(70px, 7.5vw, 92px))',
-                gap: '20px 12px',
+                position: 'absolute',
+                inset: 0,
+                zIndex: 20,
+                backgroundColor: 'rgba(4,5,7,0.97)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
                 justifyContent: 'center',
+                padding: '2rem',
+                animation: 'duality-fade-in 0.6s ease forwards',
               }}
             >
-              {WITNESSES.map((wd, i) => (
-                <button
-                  key={wd.id}
-                  onClick={() => handleGallerySelect(i)}
-                  onMouseEnter={() => setGalleryHover(i)}
-                  onMouseLeave={() => setGalleryHover(null)}
-                  aria-label={`View testimony: ${wd.role}`}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '7px',
-                    padding: 0,
-                    width: '100%',
-                  }}
-                >
-                  <div
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', letterSpacing: '0.20em', textTransform: 'uppercase', color: 'var(--color-saffron)', opacity: 0.7, marginBottom: '0.75rem' }}>
+                Nine Witnesses
+              </p>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: 400, color: 'var(--color-snow)', marginBottom: '0.5rem', textAlign: 'center' }}>
+                Revisit a voice
+              </h2>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', letterSpacing: '0.20em', color: 'rgba(230,220,197,0.3)', marginBottom: '2.5rem' }}>
+                scroll ↓ to continue
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, clamp(70px, 7.5vw, 92px))', gap: '20px 12px', justifyContent: 'center' }}>
+                {WITNESSES.map((wd, i) => (
+                  <button key={wd.id} onClick={() => handleGallerySelect(i)} onMouseEnter={() => setGalleryHover(i)} onMouseLeave={() => setGalleryHover(null)} aria-label={`View testimony: ${wd.role}`}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '7px', padding: 0, width: '100%' }}
+                  >
+                    <div style={{ position: 'relative', width: '100%', height: 'clamp(84px, 9vw, 110px)', overflow: 'hidden', borderRadius: '2px', border: galleryHover === i ? '1px solid rgba(201,123,43,0.75)' : '1px solid rgba(230,220,197,0.12)', boxShadow: galleryHover === i ? '0 0 18px rgba(201,123,43,0.22)' : 'none', transition: 'border-color 0.2s, box-shadow 0.2s', filter: 'brightness(0.88) saturate(0.9)' }}>
+                      <Image src={wd.image} alt={wd.role} fill sizes="92px" quality={75} style={{ objectFit: 'cover', objectPosition: wd.objectPosition }} />
+                      <div style={{ position: 'absolute', top: '5px', left: '7px', fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', color: 'rgba(201,123,43,0.7)', letterSpacing: '0.20em', pointerEvents: 'none' }}>{wd.numeral}</div>
+                    </div>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', width: '100%', wordBreak: 'break-word', lineHeight: 1.45, color: galleryHover === i ? 'rgba(201,123,43,0.85)' : 'rgba(230,220,197,0.38)', transition: 'color 0.2s' }}>
+                      {wd.role.replace('THE ', '')}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* ── Desktop: full-screen immersive grid ── */
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 20,
+                backgroundColor: 'rgba(4,5,7,0.97)',
+                display: 'flex',
+                flexDirection: 'column',
+                animation: 'duality-fade-in 0.6s ease forwards',
+              }}
+            >
+              {/* Header */}
+              <div style={{ flexShrink: 0, padding: '1.25rem 2rem', textAlign: 'center', borderBottom: '1px solid rgba(230,220,197,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem' }}>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', letterSpacing: '0.20em', textTransform: 'uppercase', color: 'var(--color-saffron)', opacity: 0.7, margin: 0 }}>
+                  Nine Witnesses
+                </p>
+                <span style={{ color: 'rgba(230,220,197,0.2)', fontSize: 'var(--text-xs)' }}>·</span>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 'clamp(1rem, 2vw, 1.4rem)', fontWeight: 400, color: 'var(--color-snow)', margin: 0 }}>
+                  Revisit a voice
+                </h2>
+                <span style={{ color: 'rgba(230,220,197,0.2)', fontSize: 'var(--text-xs)' }}>·</span>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', letterSpacing: '0.20em', color: 'rgba(230,220,197,0.25)', margin: 0 }}>
+                  scroll ↓ to continue
+                </p>
+              </div>
+
+              {/* Full-screen 3×3 image grid */}
+              <div
+                style={{
+                  flex: 1,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gridTemplateRows: 'repeat(3, 1fr)',
+                  gap: '2px',
+                  overflow: 'hidden',
+                }}
+              >
+                {WITNESSES.map((wd, i) => (
+                  <button
+                    key={wd.id}
+                    onClick={() => handleGallerySelect(i)}
+                    onMouseEnter={() => setGalleryHover(i)}
+                    onMouseLeave={() => setGalleryHover(null)}
+                    aria-label={`View testimony: ${wd.role}`}
                     style={{
                       position: 'relative',
-                      width: '100%',
-                      height: 'clamp(84px, 9vw, 110px)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
                       overflow: 'hidden',
-                      borderRadius: '2px',
-                      border: galleryHover === i
-                        ? '1px solid rgba(201,123,43,0.75)'
-                        : '1px solid rgba(230,220,197,0.12)',
-                      boxShadow: galleryHover === i
-                        ? '0 0 18px rgba(201,123,43,0.22)'
-                        : 'none',
-                      transition: 'border-color 0.2s, box-shadow 0.2s',
-                      filter: 'brightness(0.88) saturate(0.9)',
+                      outline: 'none',
                     }}
                   >
                     <Image
                       src={wd.image}
                       alt={wd.role}
                       fill
-                      sizes="92px"
-                      quality={75}
-                      style={{ objectFit: 'cover', objectPosition: wd.objectPosition }}
+                      sizes="33vw"
+                      quality={80}
+                      style={{
+                        objectFit: 'cover',
+                        objectPosition: wd.objectPosition,
+                        filter: galleryHover === i
+                          ? 'brightness(0.75) saturate(1.0)'
+                          : 'brightness(0.55) saturate(0.8)',
+                        transform: galleryHover === i ? 'scale(1.04)' : 'scale(1)',
+                        transition: 'filter 0.35s ease, transform 0.55s ease',
+                      }}
                     />
+                    {/* Numeral */}
+                    <div style={{ position: 'absolute', top: '14px', left: '16px', fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', color: 'rgba(201,123,43,0.65)', letterSpacing: '0.20em', pointerEvents: 'none' }}>
+                      {wd.numeral}
+                    </div>
+                    {/* Bottom label gradient */}
                     <div
                       style={{
                         position: 'absolute',
-                        top: '5px',
-                        left: '7px',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: 'var(--text-xs)',
-                        color: 'rgba(201,123,43,0.7)',
-                        letterSpacing: '0.20em',
+                        bottom: 0, left: 0, right: 0,
+                        padding: '2.5rem 1.25rem 1.25rem',
+                        background: 'linear-gradient(to top, rgba(4,5,7,0.92) 0%, rgba(4,5,7,0.5) 55%, transparent 100%)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
                         pointerEvents: 'none',
                       }}
                     >
-                      {wd.numeral}
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.6rem, 0.75vw, 0.75rem)', letterSpacing: '0.18em', textTransform: 'uppercase', color: galleryHover === i ? 'rgba(201,123,43,0.95)' : 'rgba(230,220,197,0.55)', transition: 'color 0.2s', lineHeight: 1.5 }}>
+                        {wd.role.replace('THE ', '')}
+                      </span>
                     </div>
-                  </div>
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 'var(--text-xs)',
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      textAlign: 'center',
-                      width: '100%',
-                      wordBreak: 'break-word',
-                      lineHeight: 1.45,
-                      color: galleryHover === i
-                        ? 'rgba(201,123,43,0.85)'
-                        : 'rgba(230,220,197,0.38)',
-                      transition: 'color 0.2s',
-                    }}
-                  >
-                    {wd.role.replace('THE ', '')}
-                  </span>
-                </button>
-              ))}
+                    {/* Hover border overlay */}
+                    <div style={{ position: 'absolute', inset: 0, border: galleryHover === i ? '1.5px solid rgba(201,123,43,0.60)' : '1.5px solid transparent', transition: 'border-color 0.25s', pointerEvents: 'none' }} />
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )
         )}
       </div>
     </div>
