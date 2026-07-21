@@ -231,6 +231,7 @@ export default function Duality() {
   const emberRef          = useRef<EmberSystem | null>(null);
   const sectionPassedRef       = useRef(false);                // true once user has passed through the section once
   const reviewModeRef          = useRef(false);               // mirrors reviewMode, readable in wheel handler
+  const lenisStoppedRef        = useRef(false);               // true when we stopped Lenis; restored on exit
   const reviewSelectedRef      = useRef<number | null>(null); // mirrors reviewSelected
   const pendingDirRef          = useRef(0);                   // scroll direction queued while lockRef is true
   const pendingGalleryTimerRef = useRef<number | null>(null); // auto-gallery transition timer id
@@ -491,12 +492,8 @@ export default function Duality() {
         // (At exactly next*vh the wrapper bottom == viewport bottom — any further scroll exits.)
         const offset = next === WITNESSES.length - 1 ? next - 0.5 : next;
         const targetY = wrapper.offsetTop + offset * window.innerHeight;
-        const lenis = (window as any).lenis;
-        if (lenis?.scrollTo) {
-          lenis.scrollTo(targetY, { immediate: true });
-        } else {
-          window.scrollTo(0, targetY);
-        }
+        // Lenis is stopped while the section is pinned — use window.scrollTo directly.
+        window.scrollTo({ top: targetY, behavior: 'instant' });
       }
       scheduleTimer(80, () => {
         fastReveal();
@@ -569,6 +566,20 @@ export default function Duality() {
     const ro = new ResizeObserver(resizeCanvas);
     ro.observe(sticky);
 
+    // Jump to scroll position y for exit scrolls.
+    // Lenis.onWheel does NOT check event.defaultPrevented, so e.preventDefault() alone doesn't
+    // stop Lenis from scrolling. Instead we call lenis.stop() when the section is pinned.
+    // On exit we restart Lenis from the new position so normal smooth scroll resumes.
+    function lenisExitTo(y: number) {
+      const lenis = (window as any).lenis;
+      window.scrollTo({ top: y, behavior: 'instant' });
+      if (lenis && lenisStoppedRef.current) {
+        lenisStoppedRef.current = false;
+        lenis.start();
+      }
+    }
+
+
     // Entry: trigger once when section scrolls into view
     let entered = false;
     let entryComplete = false; // true once entry card finishes and witness 0 loads
@@ -602,9 +613,7 @@ export default function Duality() {
       fastBlack(() => {
         // Past sticky-release point: wrapper.bottom - vh + 21 → isStuck()=false immediately
         const exitY = wrapper!.offsetTop + wrapper!.offsetHeight - window.innerHeight + 21;
-        const lenis = (window as any).lenis;
-        if (lenis?.scrollTo) lenis.scrollTo(exitY, { immediate: true });
-        else window.scrollTo(0, exitY);
+        lenisExitTo(exitY);
         scheduleTimer(80, () => {
           fastReveal();
           leavingUpward = false;
@@ -643,8 +652,10 @@ export default function Duality() {
     function handleWheel(e: WheelEvent) {
       if (!isStuck()) return;
 
-      // Prevent Lenis (registered before this handler) from scrolling
-      // the page while the section is pinned.
+      // Stop Lenis while the section is pinned. Lenis.onVirtualScroll checks isStopped and
+      // exits early — unlike defaultPrevented which Lenis ignores entirely.
+      const lenis = (window as any).lenis;
+      if (lenis && !lenis.isStopped) { lenis.stop(); lenisStoppedRef.current = true; }
       e.preventDefault();
 
       const dir = e.deltaY > 25 ? 1 : e.deltaY < -25 ? -1 : 0;
@@ -698,13 +709,11 @@ export default function Duality() {
         // Gallery overview → soft exit; reviewMode stays true for re-entry
         leavingUpward = true;
         lockRef.current = true;
-        const lenis = (window as any).lenis;
         mediumBlack(() => {
           const exitY = dir === 1
             ? wrapper!.offsetTop + wrapper!.offsetHeight - window.innerHeight + 21
             : Math.max(0, wrapper!.offsetTop - 30);
-          if (lenis?.scrollTo) lenis.scrollTo(exitY, { immediate: true });
-          else window.scrollTo(0, exitY);
+          lenisExitTo(exitY);
           scheduleTimer(80, () => {
             fastReveal();
             lockRef.current = false;
@@ -767,9 +776,7 @@ export default function Duality() {
           fastBlack(() => {
             // 30px above sticky top boundary → isStuck()=false immediately
             const topY = Math.max(0, wrapper!.offsetTop - 30);
-            const lenis = (window as any).lenis;
-            if (lenis?.scrollTo) lenis.scrollTo(topY, { immediate: true });
-            else window.scrollTo(0, topY);
+            lenisExitTo(topY);
             scheduleTimer(80, () => {
               fastReveal();
               lockRef.current = false;
@@ -796,9 +803,7 @@ export default function Duality() {
           lockRef.current = true;
           fastBlack(() => {
             const topY = Math.max(0, wrapper!.offsetTop - 30);
-            const lenis = (window as any).lenis;
-            if (lenis?.scrollTo) lenis.scrollTo(topY, { immediate: true });
-            else window.scrollTo(0, topY);
+            lenisExitTo(topY);
             scheduleTimer(80, () => { fastReveal(); lockRef.current = false; leavingUpward = false; });
           });
           return;
@@ -974,6 +979,7 @@ export default function Duality() {
                     sizes="62vw"
                     quality={88}
                     priority={i === 0}
+                    loading={i === 0 ? undefined : 'eager'}
                     style={{
                       objectFit: 'cover',
                       objectPosition: wd.objectPosition,
