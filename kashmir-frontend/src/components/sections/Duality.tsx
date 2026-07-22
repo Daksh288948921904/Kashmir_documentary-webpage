@@ -516,7 +516,7 @@ export default function Duality() {
     slowBlack(() => {
       setStep(0); // clear testimony now that screen is fully dark
       scheduleTimer(150, () => {
-        // Skip portrait grid entirely — reveal the Seven Voices statement directly
+        // Skip portrait grid entirely — reveal the Nine Voices statement directly
         setExitPhase(2); exitPhaseRef.current = 2;
         slowReveal(); // ease gently back in over 1s
       });
@@ -1378,7 +1378,7 @@ export default function Duality() {
                   marginBottom: '0.75rem',
                 }}
               >
-                Seven Voices
+                Nine Voices
               </h2>
               <p
                 style={{
@@ -1452,7 +1452,7 @@ export default function Duality() {
             </div>
 
             {/* Phase 2+: Conclusion block — ALL elements present from phase 2 so the
-                layout is fixed and "Seven Voices" never shifts position as later
+                layout is fixed and "Nine Voices" never shifts position as later
                 phases fade in. Phases 3 and 4 use opacity transitions, not
                 conditional renders, to avoid layout reflow. */}
             {exitPhase >= 2 && (
@@ -1464,7 +1464,7 @@ export default function Duality() {
                   gap: '2rem',
                 }}
               >
-                {/* Seven Voices — fades in at phase 2 */}
+                {/* Nine Voices — fades in at phase 2 */}
                 <div style={{ textAlign: 'center', animation: 'duality-fade-only 1.4s ease forwards' }}>
                   <h2
                     style={{
@@ -1477,7 +1477,7 @@ export default function Duality() {
                       lineHeight: 1.2,
                     }}
                   >
-                    Seven Voices — One Valley
+                    Nine Voices — One Valley
                   </h2>
                 </div>
 
