@@ -29,7 +29,13 @@ html {
 body {
   background-color: var(--color-deep-slate);
   color: var(--color-snow);
-  overflow-x: hidden;
+  /*
+    overflow-x: hidden would silently force overflow-y from `visible` to `auto`
+    (CSS spec: both axes must be compatible). That turns <body> into a scroll
+    container, which breaks every position:sticky descendant — including Duality.
+    `clip` prevents horizontal overflow without establishing a scroll container.
+  */
+  overflow-x: clip;
   min-height: 100vh;
 }
 
