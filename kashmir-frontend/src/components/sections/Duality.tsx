@@ -791,16 +791,20 @@ export default function Duality() {
       // ↑: navigate backwards through witnesses; exit above when at witness 0
       if (dir === -1) {
         if (witnessIdxRef.current <= 0) {
-          // At witness 0 (or sentinel): set sentinel so re-entry starts fresh from witness 0,
-          // then let Lenis exit naturally if near the top, or snap above if deep inside.
           witnessIdxRef.current = -1;
-          if (window.scrollY <= wrapper!.offsetTop + 60) return;
-          e.preventDefault();
+          const topY = Math.max(0, wrapper!.offsetTop - 30);
+          if (window.scrollY <= wrapper!.offsetTop + 60) {
+            // scrollY never changes between witness advances, so we are always near
+            // the wrapper top. e.preventDefault() has already fired above, and Lenis
+            // is stopped — returning without restarting Lenis would trap the user.
+            // Jump just above the wrapper and restart Lenis so normal scroll resumes.
+            lenisExitTo(topY);
+            return;
+          }
           leavingUpward = true;
           lockedEventCountRef.current = 0;
           lockRef.current = true;
           fastBlack(() => {
-            const topY = Math.max(0, wrapper!.offsetTop - 30);
             lenisExitTo(topY);
             scheduleTimer(80, () => { fastReveal(); lockRef.current = false; leavingUpward = false; });
           });
