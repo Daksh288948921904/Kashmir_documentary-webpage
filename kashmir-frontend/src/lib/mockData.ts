@@ -15,7 +15,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'cultural',
     description: 'Shah Mir establishes the first Muslim sultanate in Kashmir, ending centuries of Hindu and Buddhist rule. For 222 years, six successive dynasties will govern the valley, weaving Islamic traditions into the Kashmiri cultural fabric that endures to this day.',
     lat: 34.09, lng: 74.80, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Dal_Lake.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Dal_Lake_Hazratbal_Srinagar.jpg/800px-Dal_Lake_Hazratbal_Srinagar.jpg',
   },
   {
     year: 1586,
@@ -23,7 +23,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'cultural',
     description: "Emperor Akbar annexes Kashmir into the Mughal Empire after two earlier failed attempts. His son Jahangir later calls it 'paradise on earth.' The Shalimar and Nishat Bagh gardens are built on Dal Lake. Beauty becomes an instrument of empire.",
     lat: 34.08, lng: 74.79, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Akbar.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Govardhan._Akbar_With_Lion_and_Calf_ca._1630%2C_Metmuseum_%28cropped%29.jpg/800px-Govardhan._Akbar_With_Lion_and_Calf_ca._1630%2C_Metmuseum_%28cropped%29.jpg',
   },
   {
     year: 1752,
@@ -31,7 +31,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "Ahmad Shah Durrani's Afghan empire wrenches Kashmir from the declining Mughals. Six decades of Afghan rule follow — remembered in Kashmir as a period of harsh extraction, forced conversions, and deep impoverishment. The memory shapes Kashmiri identity.",
     lat: 34.09, lng: 74.80, place: 'Kashmir Valley',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Ahmad_Shah_Durrani.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Portrait_of_Ahmad-Shah_Durrani._Mughal_miniature._ca._1757%2C_Biblioth%C3%A8que_nationale_de_France_%28cropped%29.jpg/800px-Portrait_of_Ahmad-Shah_Durrani._Mughal_miniature._ca._1757%2C_Biblioth%C3%A8que_nationale_de_France_%28cropped%29.jpg',
   },
   {
     year: 1819,
@@ -39,7 +39,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "Ranjit Singh's Sikh Empire takes Kashmir from the Afghans. The valley becomes the empire's prized summer territory. Sikh rule lasts 27 years — until the British defeat the Sikh armies in two Anglo-Sikh wars and everything changes.",
     lat: 34.08, lng: 74.78, place: 'Kashmir Valley',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Ranjit_Singh.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Oval-shaped_tondo_portrait_painting_of_Maharaja_Ranjit_Singh%2C_Lucknow%2C_Awadh%2C_ca.1810%E2%80%9320_%28oval_crop%29.webp/800px-Oval-shaped_tondo_portrait_painting_of_Maharaja_Ranjit_Singh%2C_Lucknow%2C_Awadh%2C_ca.1810%E2%80%9320_%28oval_crop%29.webp.png',
   },
   {
     year: 1846,
@@ -47,7 +47,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "After defeating the Sikhs, the British sell Kashmir and its people to Dogra ruler Gulab Singh for 75 lakh Nanakshahi rupees under the Treaty of Amritsar. A people traded like property. The Dogra dynasty begins its century of rule. Kashmiris are never asked.",
     lat: 32.73, lng: 74.87, place: 'Jammu',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Maharaja_Gulab_Singh.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Maharaja_Gulab_Singh_of_Jammu_and_Kashmir.jpg/800px-Maharaja_Gulab_Singh_of_Jammu_and_Kashmir.jpg',
     doc: {
       kind: 'Foundational Treaty',
       name: 'Treaty of Amritsar (1846)',
@@ -63,7 +63,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "Mass protests erupt against the repressive Dogra regime across the valley. On July 13, Dogra police open fire on a crowd outside Srinagar Central Jail, killing 22 demonstrators. July 13 becomes Kashmir's Martyrs' Day. A young Sheikh Mohammad Abdullah emerges as a political voice of the people.",
     lat: 34.09, lng: 74.80, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Sheikh_Mohammad_Abdullah.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Sheikh_Abdullah_1988_stamp_of_India.jpg/800px-Sheikh_Abdullah_1988_stamp_of_India.jpg',
   },
   {
     year: 1939,
@@ -71,7 +71,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "Sheikh Mohammad Abdullah transforms the Muslim Conference into the All Jammu & Kashmir National Conference — a secular, cross-community movement against autocratic Dogra rule. The 'Naya Kashmir' manifesto of 1944 envisions land reform, universal education, equal rights. A brief democratic horizon.",
     lat: 34.08, lng: 74.79, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Sheikh_Mohammad_Abdullah.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Sheikh_Abdullah_1988_stamp_of_India.jpg/800px-Sheikh_Abdullah_1988_stamp_of_India.jpg',
   },
   {
     year: 1947,
@@ -79,7 +79,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "India and Pakistan gain independence on August 15. Maharaja Hari Singh — a Hindu ruler of a Muslim-majority state — delays signing accession to either nation. Pakistani tribal militias backed by the army invade on October 22. Singh signs the Instrument of Accession to India on October 26. Indian troops airlift into Srinagar. The wound that will not close opens.",
     lat: 34.09, lng: 74.80, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Maharaja_Hari_Singh.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Hari_Singh_1931.jpg/800px-Hari_Singh_1931.jpg',
     doc: {
       kind: 'Accession Instrument',
       name: 'Instrument of Accession (Jammu & Kashmir)',
@@ -95,7 +95,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "The first Indo-Pakistani war over Kashmir continues through winter. The UN Security Council passes Resolution 47 on April 21, ordering a ceasefire and a free plebiscite to let Kashmiris decide their future. India and Pakistan agree. A ceasefire takes effect on January 1, 1949. The Ceasefire Line divides the territory. The plebiscite is never held.",
     lat: 34.08, lng: 74.08, place: 'Uri Sector',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Indo-Pakistani_War_of_1947.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Indian_soldiers_landing_at_Srinagar_airfield_during_the_1947%E2%80%931948_war.jpg/800px-Indian_soldiers_landing_at_Srinagar_airfield_during_the_1947%E2%80%931948_war.jpg',
     doc: {
       kind: 'UN Resolution',
       name: 'UNSC Resolution 47 (1948)',
@@ -111,7 +111,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "Article 370 is incorporated into the Indian Constitution, granting Jammu & Kashmir a unique special status. J&K has its own constitution, its own flag, and exclusive jurisdiction over all matters except defence, foreign affairs, finance, and communications. Described as a 'temporary provision' in 1949 — it lasts 70 years.",
     lat: 34.08, lng: 74.79, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Jawaharlal_Nehru.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/97/Nehru_in_the_Netherlands%2C_1957.jpg',
     doc: {
       kind: 'Constitutional Article',
       name: 'Article 370 of the Constitution of India',
@@ -127,7 +127,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "Prime Minister Sheikh Abdullah is dismissed and arrested, accused of conspiring with foreign powers and flirting with independence. He will spend most of the next 22 years imprisoned or in political exile. The man who led the valley into India's embrace is removed from it. The democratic promise of Kashmir's politics begins to hollow.",
     lat: 34.09, lng: 74.80, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Sheikh_Mohammad_Abdullah.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Sheikh_Abdullah_1988_stamp_of_India.jpg/800px-Sheikh_Abdullah_1988_stamp_of_India.jpg',
   },
   {
     year: 1957,
@@ -135,7 +135,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "Jammu & Kashmir adopts its own state constitution on January 26, cementing a unique political arrangement within India. The state assembly endorses accession. Pakistan and the UN contest the legitimacy of this move without a plebiscite. The question of self-determination is politically sealed — not resolved.",
     lat: 34.08, lng: 74.79, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Dal_Lake.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Dal_Lake_Hazratbal_Srinagar.jpg/800px-Dal_Lake_Hazratbal_Srinagar.jpg',
   },
   {
     year: 1960,
@@ -143,7 +143,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: 'After nine years of World Bank mediation, India and Pakistan divide the Indus river system: the eastern rivers (Ravi, Beas, Sutlej) to India, the western rivers (Indus, Jhelum, Chenab) largely to Pakistan. The treaty survives every subsequent war — until 2025.',
     lat: 24.86, lng: 67.01, place: 'Karachi',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Indus_River_at_Skardu.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Nanga_Parbat_Indus_Gorge.jpg/800px-Nanga_Parbat_Indus_Gorge.jpg',
     doc: {
       kind: 'Water Treaty',
       name: 'Indus Waters Treaty (1960)',
@@ -159,7 +159,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "China's PLA launches surprise attacks on India in the Western and Eastern Himalayas. In the western sector, China seizes Aksai Chin — 37,244 sq km of high-altitude plateau that it had quietly been building a strategic road through since the 1950s, undetected by India. India is routed. China retains Aksai Chin. The third dimension of Kashmir's contested sovereignty takes permanent shape.",
     lat: 34.90, lng: 78.50, place: 'Aksai Chin / Ladakh',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Aksai_Chin.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Indian_soldiers_on_patrol_during_the_1962_Sino-Indian_border_war.jpg/800px-Indian_soldiers_on_patrol_during_the_1962_Sino-Indian_border_war.jpg',
   },
   {
     year: 1963,
@@ -167,7 +167,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'cultural',
     description: "The Moi-e-Muqqadas — a hair of the Prophet Mohammad — is stolen from the Hazratbal shrine in Srinagar on December 27. Mass protests paralyse the valley for weeks. The relic mysteriously reappears on January 4, 1964. The crisis deepens mistrust of the Indian state and reinforces Kashmiri Muslim identity as a political force.",
     lat: 34.13, lng: 74.83, place: 'Hazratbal, Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hazratbal_Mosque.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Hazratbal_2014-08-23_10-56.jpg/800px-Hazratbal_2014-08-23_10-56.jpg',
   },
   {
     year: 1965,
@@ -175,7 +175,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "Pakistan launches Operation Gibraltar, infiltrating thousands of trained guerrillas across the Ceasefire Line to spark an uprising that never materialises — Kashmiris do not join. Full-scale war erupts. The Tashkent Declaration restores pre-war positions. Nothing changes. Everything hardens. The belief that military force can resolve Kashmir is reaffirmed — wrongly — on both sides.",
     lat: 34.08, lng: 74.08, place: 'Uri / Chamb Sector',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Indo-Pakistani_War_of_1965.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/1965_Indo-Pak_War_DestroyedShermanTank.jpg/800px-1965_Indo-Pak_War_DestroyedShermanTank.jpg',
   },
   {
     year: 1966,
@@ -183,7 +183,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: 'Mediated by the Soviet Union, Indian PM Shastri and Pakistani President Ayub Khan sign the Tashkent Declaration, agreeing to withdraw to pre-war positions and restore relations. Shastri dies in Tashkent hours after signing. The Kashmir question is left entirely untouched.',
     lat: 41.30, lng: 69.24, place: 'Tashkent, USSR',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Lal_Bahadur_Shastri.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Ayub_Khan_%28ex-president_Pakistan%29%2C_Ayub_Khan_%28links%29_en_Kosygin%2C_Bestanddeelnr_925-3209.jpg/800px-Ayub_Khan_%28ex-president_Pakistan%29%2C_Ayub_Khan_%28links%29_en_Kosygin%2C_Bestanddeelnr_925-3209.jpg',
     doc: {
       kind: 'Peace Declaration',
       name: 'Tashkent Declaration (1966)',
@@ -199,7 +199,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "India goes to war with Pakistan in support of Bangladesh's independence. Pakistan is militarily crushed on the eastern front. 93,000 Pakistani soldiers surrender. Bangladesh is born. The political equation in South Asia shifts permanently. Pakistan's strategic humiliation will reshape its Kashmir policy — greater covert involvement, greater proxy pressure — for decades.",
     lat: 32.73, lng: 74.86, place: 'Jammu Front',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Instrument_of_Surrender_-_Bangladesh.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/BangladeshLiberationWarMontage.jpg/800px-BangladeshLiberationWarMontage.jpg',
   },
   {
     year: 1972,
@@ -207,7 +207,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "India and Pakistan sign the Shimla Agreement on July 2. The former UN Ceasefire Line is renamed the Line of Control. Both sides agree to resolve the Kashmir issue bilaterally — without third-party intervention — through peaceful negotiations. The UN plebiscite is effectively buried. The LoC becomes the de facto border that neither side accepts as permanent.",
     lat: 32.73, lng: 74.86, place: 'Jammu & Kashmir',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Indira_Gandhi.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Indira_Gandhi_official_portrait.png/800px-Indira_Gandhi_official_portrait.png',
     doc: {
       kind: 'Bilateral Agreement',
       name: 'Simla Agreement (1972)',
@@ -223,7 +223,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "India launches Operation Meghdoot on April 13 — airlifting troops to the Siachen Glacier at up to 6,000m altitude, pre-empting a similar Pakistani operation. India secures the Saltoro Ridge. Pakistan responds militarily. The world's highest and coldest battlefield is born. Over the following decades, both armies lose more soldiers to avalanches, altitude sickness, and frostbite than to enemy fire.",
     lat: 35.42, lng: 77.10, place: 'Siachen Glacier',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Siachen_glacier.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Siachen_Glacier_Satellite_Image%2C_1.jpg/800px-Siachen_Glacier_Satellite_Image%2C_1.jpg',
   },
   {
     year: 1987,
@@ -231,7 +231,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "State assembly elections are widely alleged to be rigged in favour of the ruling National Conference-Congress alliance. Muslim United Front candidates — including future militant commanders — who won at the polls find their victories reversed and themselves arrested. A generation that had committed to the democratic path turns toward the gun. The 1987 elections are widely cited as the insurgency's ignition switch.",
     lat: 34.09, lng: 74.80, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Srinagar.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Kashmir-sat-nasa.jpg/800px-Kashmir-sat-nasa.jpg',
   },
   {
     year: 1989,
@@ -239,7 +239,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "The Jammu & Kashmir Liberation Front launches armed operations demanding azadi. The kidnapping of Rubaiya Sayeed — daughter of Union Home Minister Mufti Mohammed Sayeed — shocks India into releasing five militants. Multiple armed groups emerge. The valley tips into full insurgency. The Indian Army and paramilitary forces pour in. An estimated 70,000–100,000 people will die over the following three decades.",
     lat: 34.08, lng: 74.80, place: 'Kashmir Valley',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Kashmir_unrest.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Kashmir_region._LOC_2003626427_-_showing_sub-regions_administered_by_different_countries.jpg/800px-Kashmir_region._LOC_2003626427_-_showing_sub-regions_administered_by_different_countries.jpg',
   },
   {
     year: 1990,
@@ -247,7 +247,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'humanitarian',
     description: "In the winter of 1990, between 100,000 and 250,000 Kashmiri Pandits — the valley's indigenous Hindu minority present for millennia — flee their homes under threat. Targeted killings of prominent Pandits, mosque broadcasts urging departure, and a failure of state protection create mass panic. Governor Jagmohan imposes direct rule. AFSPA gives security forces sweeping, unaccountable powers. The Pandits become refugees in their own country — and the wound between communities does not heal.",
     lat: 34.09, lng: 74.79, place: 'Kashmir Valley',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Kashmiri_Pandit_camps.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/39/KashmirPundit1895BritishLibrary.jpg/800px-KashmirPundit1895BritishLibrary.jpg',
   },
   {
     year: 1995,
@@ -255,7 +255,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "The 14th-century Charar-e-Sharif shrine — sacred to Kashmiri Sufis for six centuries — burns to the ground during a months-long standoff between militants and Indian security forces. Each side blames the other. That same year, the Al-Faran militant group kidnaps six Western trekkers in the Pahalgam mountains. One escapes, one is beheaded and found, four are never seen again.",
     lat: 33.95, lng: 74.72, place: 'Charar-e-Sharif',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Char-i-Sharif.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Alamdar_e_Kashmir.jpg/800px-Alamdar_e_Kashmir.jpg',
   },
   {
     year: 1999,
@@ -263,7 +263,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "Prime Ministers Vajpayee and Sharif sign the Lahore Declaration, committing to peace and nuclear restraint after both states had tested weapons in 1998. The Kargil intrusion, which begins months later, undoes the fragile optimism.",
     lat: 31.52, lng: 74.36, place: 'Lahore',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Atal_Bihari_Vajpayee.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Atal_Bihari_Vajpayee_%28crop_2%29.jpg/800px-Atal_Bihari_Vajpayee_%28crop_2%29.jpg',
     doc: {
       kind: 'Peace Declaration',
       name: 'Lahore Declaration (1999)',
@@ -279,7 +279,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "Pakistani soldiers and Lashkar-e-Taiba militants secretly cross the LoC during winter and occupy strategic Indian positions in the Kargil hills — some at 5,000m. India responds with Operation Vijay. 527 Indian and an estimated 357–453 Pakistani soldiers are officially killed. The US intervenes diplomatically. Pakistan withdraws. India recaptures nearly all positions. Two nuclear-armed states come to the brink. The world watches.",
     lat: 34.55, lng: 76.13, place: 'Kargil',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Kargil_War.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Kargil_war.jpg/800px-Kargil_war.jpg',
   },
   {
     year: 2001,
@@ -287,7 +287,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "On December 13, Lashkar-e-Taiba and Jaish-e-Mohammed operatives attack the Indian Parliament in New Delhi, killing 14 people including all five attackers. India deploys half a million troops to the Pakistani border. Nuclear war fears reach their highest point since the Cold War. International pressure forces de-escalation. Pakistan bans both organisations — temporarily. Kashmir remains the unstated text of the entire crisis.",
     lat: 34.32, lng: 73.88, place: 'LoC / Uri Sector',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Parliament_of_India.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Sansad_Bhavan-2.jpg/800px-Sansad_Bhavan-2.jpg',
   },
   {
     year: 2005,
@@ -295,7 +295,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "On April 7, a bus crosses the Line of Control for the first time in 57 years, connecting Srinagar (India) and Muzaffarabad (AJK capital). Passengers — many meeting family members separated since Partition — are photographed weeping at the crossing. Trade routes open briefly. The service carries hope across a line that does not officially acknowledge the people it divides.",
     lat: 34.09, lng: 74.80, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Muzaffarabad.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Pakistan_is_full_of_breathtaking_views_-_Muzafarabad.JPG/800px-Pakistan_is_full_of_breathtaking_views_-_Muzafarabad.JPG',
   },
   {
     year: 2008,
@@ -303,7 +303,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "A proposed transfer of forest land to the Shri Amarnath Shrine Board triggers the largest mass protests in a decade. The valley shuts down completely. On the Pakistani side, parallel protests against Indian rule. Then the Mumbai terror attacks of November 2008 — attributed to Lashkar-e-Taiba — bring India and Pakistan back to the edge. Old anger finds new fuel on both sides.",
     lat: 34.09, lng: 74.80, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Amarnath_cave.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Cave_Temple_of_Lord_Amarnath.jpg/800px-Cave_Temple_of_Lord_Amarnath.jpg',
   },
   {
     year: 2010,
@@ -311,7 +311,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "Mass protests erupt across the valley after the killing of a teenager in an alleged fake encounter. For three months, stone-throwing youth face live ammunition from Central Reserve Police Force. At least 120 civilians are killed. Curfews last weeks at a time. A generation born after the 1989 insurgency finds its own language of resistance — rock in hand, face covered, running.",
     lat: 34.09, lng: 74.80, place: 'Srinagar & Valley',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Kashmir_protests_2010.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Kashmir-sat-nasa.jpg/800px-Kashmir-sat-nasa.jpg',
   },
   {
     year: 2016,
@@ -319,7 +319,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: "On July 8, Indian security forces kill Hizbul Mujahideen commander Burhan Wani — a young, social-media-savvy militant with 70,000 Facebook followers who had made militancy aspirational for a new generation. What follows: 87 days of curfew, the worst in years. Security forces fire pellet guns into crowds at close range. An estimated 600 people are blinded or partially blinded. Wani becomes a symbol for those who grew up after the insurgency.",
     lat: 33.68, lng: 75.15, place: 'South Kashmir',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Kashmir_Valley.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/en/5/5f/Burhan_Wani.jpg',
   },
   {
     year: 2019,
@@ -327,7 +327,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "On August 5, the Indian Parliament abrogates Article 370 and Article 35A, stripping Jammu & Kashmir of its special status and statehood in a single session. J&K is bifurcated into two Union Territories: Jammu & Kashmir and Ladakh. A complete communications blackout — mobile networks, internet, landlines — seals the valley for months. Thousands are preventively detained, including elected politicians. The world watches from outside.",
     lat: 34.09, lng: 74.80, place: 'Srinagar',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Parliament_of_India.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Sansad_Bhavan-2.jpg/800px-Sansad_Bhavan-2.jpg',
     doc: {
       kind: 'Presidential Order',
       name: 'Constitutional Order C.O. 272 (2019)',
@@ -343,7 +343,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: 'Parliament splits Jammu & Kashmir into two Union Territories — Jammu & Kashmir (with a legislature) and Ladakh (without one) — under direct central administration. The state loses its statehood. The reorganisation takes effect on 31 October 2019.',
     lat: 28.62, lng: 77.24, place: 'New Delhi',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Jammu_and_Kashmir_on_the_globe.svg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/800px-Emblem_of_India.svg.png',
     doc: {
       kind: 'Act of Parliament',
       name: 'J&K Reorganisation Act, 2019',
@@ -359,7 +359,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "The Indian government introduces new domicile rules allowing non-Kashmiris who have lived in J&K for 15 years — including government employees posted there — to become permanent residents and own land and property. The pre-370 Permanent Resident Certificate system, which restricted land ownership to state subjects, is abolished. Kashmiris call it demographic engineering. India frames it as equality.",
     lat: 34.09, lng: 74.79, place: 'Jammu & Kashmir',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Srinagar_city.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Hari_niwas.jpg/800px-Hari_niwas.jpg',
   },
   {
     year: 2021,
@@ -367,7 +367,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "The Delimitation Commission redraws J&K's assembly constituencies for the first time in decades. The commission adds six new seats in Jammu and one in Kashmir — critics allege the redrawing favours the Hindu-majority Jammu region at the expense of the Muslim-majority Kashmir Valley. The commission's recommendations become the electoral map for the 2024 elections.",
     lat: 32.73, lng: 74.87, place: 'Jammu',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Jammu_city.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Hari_niwas.jpg/800px-Hari_niwas.jpg',
   },
   {
     year: 2023,
@@ -375,7 +375,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "A five-judge Constitution Bench unanimously upholds the 2019 abrogation of Article 370 as constitutionally valid, declares it a temporary provision, and orders assembly elections by September 2024 and the eventual restoration of statehood. A landmark judgment on the region's constitutional future.",
     lat: 28.62, lng: 77.24, place: 'New Delhi',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Supreme_Court_of_India.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Emblem_of_the_Supreme_Court_of_India.svg/800px-Emblem_of_the_Supreme_Court_of_India.svg.png',
     doc: {
       kind: 'Court Judgment',
       name: 'In re: Article 370 of the Constitution (2023)',
@@ -391,7 +391,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "Jammu & Kashmir holds its first assembly elections since the revocation of Article 370 — and the first since it was made a Union Territory in 2019. The National Conference-Congress alliance wins. Omar Abdullah becomes Chief Minister. The restoration of full statehood — promised by the Indian government — remains undelivered. Whether democracy has returned, or its form, is the question the film is still asking.",
     lat: 34.09, lng: 74.80, place: 'Jammu & Kashmir',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Dal_Lake.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Omar_Abdullah%2C_Chief_Minister_of_Jammu_%26_Kashmir.jpg/800px-Omar_Abdullah%2C_Chief_Minister_of_Jammu_%26_Kashmir.jpg',
   },
   {
     year: 2025,
@@ -399,7 +399,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'conflict',
     description: 'On April 22, militants kill 26 tourists at Pahalgam — the deadliest civilian attack in the valley in a quarter-century. India blames Pakistan-backed groups. On May 7, India launches Operation Sindoor, striking targets across Pakistan-administered Kashmir and Pakistan. Four days of exchanges follow before a ceasefire understanding is reached.',
     lat: 34.01, lng: 75.32, place: 'Pahalgam / LoC',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Pahalgam.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Baisaran_Valley_Kashmir24102023.jpg/800px-Baisaran_Valley_Kashmir24102023.jpg',
   },
   {
     year: 2025,
@@ -407,7 +407,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: "Following the Pahalgam attack, India puts the 1960 Indus Waters Treaty in abeyance — the first time since it was signed. Pakistan retaliates by suspending the Simla Agreement and closing its airspace to Indian aircraft. Two foundational agreements of South Asian coexistence are placed simultaneously on hold.",
     lat: 28.62, lng: 77.24, place: 'New Delhi',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Indus_River.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Nanga_Parbat_Indus_Gorge.jpg/800px-Nanga_Parbat_Indus_Gorge.jpg',
     doc: {
       kind: 'Government Decision',
       name: 'Cabinet Committee on Security Decision (2025)',
@@ -423,7 +423,7 @@ export const MOCK_TIMELINE: TimelineEvent[] = [
     category: 'political',
     description: 'Jammu & Kashmir remains a Union Territory awaiting the promised restoration of statehood. The Indus Waters Treaty is still suspended. The territory remains divided among India, Pakistan, and China. The ceasefire line drawn in 1949 still holds. No plebiscite has ever been held. This film was made in this moment.',
     lat: 34.09, lng: 74.80, place: 'Jammu & Kashmir',
-    imgUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Dal_Lake.jpg?width=800',
+    imgUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Dal_Lake_Hazratbal_Srinagar.jpg/800px-Dal_Lake_Hazratbal_Srinagar.jpg',
   },
 ];
 
