@@ -41,8 +41,16 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
   const password   = clean(s.airpayPassword);
   const apiKey     = clean(s.airpayApiKey);
 
-  const txnId    = `KFP${Date.now()}`;
-  const amount   = String(s.documentaryPriceInr);
+  if (!merchantId || !username || !password || !apiKey) {
+    throw new Error(
+      `Airpay credentials not configured. Set AIRPAY_MERCHANT_ID, AIRPAY_USERNAME, AIRPAY_PASSWORD, AIRPAY_API_KEY in environment variables.`
+    );
+  }
+
+  const txnId = `KFP${Date.now()}`;
+  // Airpay normalises amount to 2 decimal places server-side before computing checksum.
+  // We must use the same format or the checksums will never match.
+  const amount = parseFloat(String(s.documentaryPriceInr)).toFixed(2);
   const currency = '356'; // INR
 
   const privateKey = sha256(`${apiKey}@${username}:|:${password}`);
@@ -69,6 +77,11 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
   ].join('~:~');
 
   const checksum = sha256(`${sKey}@${buyerData}`);
+
+  // Log for debugging — visible in Vercel / Render function logs (no credentials logged)
+  console.log('[airpay] order', txnId, 'amount', amount, 'mercid', merchantId);
+  console.log('[airpay] buyer_data', buyerData);
+  console.log('[airpay] checksum', checksum);
 
   const callbackUrl = `${s.frontendUrl}/api/payment/callback`;
 
