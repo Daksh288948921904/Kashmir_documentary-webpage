@@ -53,6 +53,22 @@ function transformNewsResponse(raw: Record<string, unknown>): NewsResponse | nul
   };
 }
 
+function transformTimelineResponse(raw: Record<string, unknown>): TimelineResponse | null {
+  if (!Array.isArray(raw?.events)) return null;
+  return {
+    events: (raw.events as Record<string, unknown>[]).map((ev) => ({
+      year:        Number(ev.year),
+      title:       String(ev.title ?? ''),
+      category:    (ev.category as TimelineResponse['events'][number]['category']) ?? 'political',
+      description: String(ev.description ?? ''),
+      lat:         ev.lat != null ? Number(ev.lat) : undefined,
+      lng:         ev.lng != null ? Number(ev.lng) : undefined,
+      place:       ev.place ? String(ev.place) : undefined,
+      imgUrl:      ev.image_url ? String(ev.image_url) : undefined,
+    })),
+  };
+}
+
 function transformSocialResponse(raw: Record<string, unknown>): SocialResponse | null {
   if (!Array.isArray(raw?.posts)) return null;
   return {
@@ -77,8 +93,17 @@ function transformSocialResponse(raw: Record<string, unknown>): SocialResponse |
 ───────────────────────────────────────────────────────────── */
 
 export const api = {
-  /* Documentary — field names match backend directly */
-  timeline:   () => get<TimelineResponse>('/documentary/timeline'),
+  /* Documentary — timeline needs image_url → imgUrl transform */
+  timeline: async (): Promise<TimelineResponse | null> => {
+    try {
+      const res = await fetch(`${BASE}/documentary/timeline`, {
+        next: { revalidate: 900 },
+        signal: AbortSignal.timeout(CONFIG.api.timeoutMs),
+      });
+      if (!res.ok) return null;
+      return transformTimelineResponse(await res.json());
+    } catch { return null; }
+  },
   timestamps: () => get<DocumentaryTimestamps>('/documentary/timestamps'),
 
   /* News — backend endpoint is /news/feed, fields are transformed */
