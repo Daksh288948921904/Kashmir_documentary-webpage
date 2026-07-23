@@ -143,7 +143,7 @@ function PhotoCard({ event }: { event: TimelineEvent }) {
       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.14)'; }}
       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'; }}
     >
-      {/* Photo placeholder */}
+      {/* Photo */}
       <div style={{
         height: '190px',
         flexShrink: 0,
@@ -151,20 +151,31 @@ function PhotoCard({ event }: { event: TimelineEvent }) {
         background: 'linear-gradient(170deg, #191b21 0%, #22242c 45%, #13151a 100%)',
         overflow: 'hidden',
       }}>
-        {/* Subtle film-grain texture via repeating gradient */}
+        {event.imgUrl && (
+          <img
+            src={event.imgUrl}
+            alt={event.title}
+            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+            style={{
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%',
+              objectFit: 'cover', objectPosition: 'center top',
+              filter: 'sepia(0.18) brightness(0.82) contrast(1.05)',
+            }}
+          />
+        )}
+        {/* Subtle film-grain texture */}
         <div aria-hidden style={{
           position: 'absolute', inset: 0,
           backgroundImage: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 4px)',
           pointerEvents: 'none',
         }} />
-        {/* Camera icon */}
+        {/* Bottom gradient vignette over image */}
         <div aria-hidden style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          opacity: 0.06, fontSize: '2rem', color: '#fff', userSelect: 'none',
-        }}>
-          ◻
-        </div>
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
+          background: 'linear-gradient(to bottom, transparent, rgba(6,8,10,0.55))',
+          pointerEvents: 'none',
+        }} />
       </div>
 
       {/* Card body */}
@@ -198,7 +209,7 @@ function PhotoCard({ event }: { event: TimelineEvent }) {
 
         {/* Location */}
         {event.place && (
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(255,255,255,0.38)', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'rgba(255,255,255,0.65)', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
             <span>◦</span> {event.place.toUpperCase()}
           </div>
         )}
@@ -212,7 +223,7 @@ function PhotoCard({ event }: { event: TimelineEvent }) {
         <p style={{
           fontFamily: 'var(--font-body)',
           fontSize: '0.845rem',
-          color: 'rgba(255,255,255,0.45)',
+          color: 'rgba(255,255,255,0.72)',
           lineHeight: 1.68,
           margin: 0,
           flexGrow: 1,

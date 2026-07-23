@@ -36,6 +36,7 @@ export interface TimelineEvent {
   lng?: number;
   place?: string;
   doc?: TimelineDoc;
+  imgUrl?: string;
 }
 
 export interface TimelineResponse {
