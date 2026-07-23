@@ -176,6 +176,17 @@ function PhotoCard({ event }: { event: TimelineEvent }) {
           background: 'linear-gradient(to bottom, transparent, rgba(6,8,10,0.55))',
           pointerEvents: 'none',
         }} />
+        {/* Image attribution */}
+        {event.imgUrl?.includes('wikimedia.org') && (
+          <div aria-hidden style={{
+            position: 'absolute', bottom: '5px', right: '6px',
+            fontFamily: 'var(--font-mono)', fontSize: '0.42rem',
+            color: 'rgba(255,255,255,0.32)', letterSpacing: '0.04em',
+            pointerEvents: 'none', userSelect: 'none',
+          }}>
+            © Wikimedia Commons
+          </div>
+        )}
       </div>
 
       {/* Card body */}
