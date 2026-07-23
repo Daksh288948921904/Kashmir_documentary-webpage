@@ -918,7 +918,7 @@ export default function Hero() {
             {PANEL_CENTER.heading}
           </h3>
           <div style={{ ...panelDividerStyle, position: 'relative', width: '30px', background: 'rgba(201,123,43,0.65)' }} />
-          <p style={{ ...panelBodyStyle, position: 'relative', fontStyle: 'italic', color: 'rgba(245,240,232,0.60)' }}>
+          <p style={{ ...panelBodyStyle, position: 'relative', fontStyle: 'italic', color: 'rgba(245,240,232,0.92)' }}>
             {PANEL_CENTER.body}
           </p>
         </div>
@@ -1043,7 +1043,7 @@ export default function Hero() {
         >
           {[String(FILM.releaseYear), 'Documentary', FILM.productionCompany].map((item, i, arr) => (
             <Fragment key={i}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', letterSpacing: '0.20em', textTransform: 'uppercase', color: 'rgba(245,240,232,0.62)', textShadow: '0 1px 6px rgba(0,0,0,0.9)' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', letterSpacing: '0.20em', textTransform: 'uppercase', color: 'rgba(245,240,232,0.90)', textShadow: '0 1px 6px rgba(0,0,0,0.9)' }}>
                 {item}
               </span>
               {i < arr.length - 1 && (
@@ -1070,7 +1070,7 @@ export default function Hero() {
           <span style={{
             fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)',
             letterSpacing: '0.20em', textTransform: 'uppercase',
-            color: 'rgba(245,240,232,0.50)', textShadow: '0 1px 6px rgba(0,0,0,0.9)',
+            color: 'rgba(245,240,232,0.88)', textShadow: '0 1px 6px rgba(0,0,0,0.9)',
           }}>
             Scroll
           </span>
@@ -1236,7 +1236,7 @@ const panelLabelStyle: React.CSSProperties = {
   fontFamily: 'var(--font-mono)',
   fontSize: 'var(--text-xs)', letterSpacing: '0.24em',
   textTransform: 'uppercase',
-  color: 'rgba(245,240,232,0.48)',
+  color: 'rgba(245,240,232,0.82)',
   marginBottom: '1.1rem', display: 'block',
 };
 

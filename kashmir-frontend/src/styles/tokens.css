@@ -20,9 +20,9 @@
   --color-ash-dim:        #2A2E34;   /* subtle dividers */
 
   /* Text */
-  --color-snow:           #F5F0E8;   /* primary text */
-  --color-snow-dim:       #C5BFB3;   /* secondary text */
-  --color-ash-text:       #6B7280;   /* muted / metadata text */
+  --color-snow:           #FAFAF8;   /* primary text */
+  --color-snow-dim:       #E2DDD6;   /* secondary text */
+  --color-ash-text:       #B0AAA2;   /* muted / metadata text */
 
   /* Accent — Saffron Ember (Kashmir saffron, warmth, life) */
   --color-saffron:        #C97B2B;   /* primary accent */
@@ -51,20 +51,20 @@
   --font-mono:      var(--font-space-mono), 'Space Mono', 'Courier New', monospace;
 
   /* Type Scale */
-  --text-xs:   0.625rem;   /* 10px — Space Mono labels */
-  --text-sm:   0.75rem;    /* 12px — metadata */
-  --text-base: 0.875rem;   /* 14px — body small */
-  --text-md:   1rem;       /* 16px — body */
-  --text-lg:   1.125rem;   /* 18px */
-  --text-xl:   1.25rem;    /* 20px */
-  --text-2xl:  1.5rem;     /* 24px */
-  --text-3xl:  1.875rem;   /* 30px */
-  --text-4xl:  2.25rem;    /* 36px */
-  --text-5xl:  3rem;       /* 48px */
-  --text-6xl:  3.75rem;    /* 60px */
-  --text-7xl:  4.5rem;     /* 72px */
-  --text-8xl:  6rem;       /* 96px — hero title */
-  --text-9xl:  8rem;       /* 128px — display only */
+  --text-xs:   0.75rem;    /* 12px — Space Mono labels */
+  --text-sm:   0.875rem;   /* 14px — metadata */
+  --text-base: 1rem;       /* 16px — body small */
+  --text-md:   1.125rem;   /* 18px — body */
+  --text-lg:   1.25rem;    /* 20px */
+  --text-xl:   1.375rem;   /* 22px */
+  --text-2xl:  1.625rem;   /* 26px */
+  --text-3xl:  2rem;       /* 32px */
+  --text-4xl:  2.5rem;     /* 40px */
+  --text-5xl:  3.25rem;    /* 52px */
+  --text-6xl:  4rem;       /* 64px */
+  --text-7xl:  4.75rem;    /* 76px */
+  --text-8xl:  6.25rem;    /* 100px — hero title */
+  --text-9xl:  8.5rem;     /* 136px — display only */
 
   /* ─────────────────────────────────────
      SPACING

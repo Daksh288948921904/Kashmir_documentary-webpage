@@ -15,7 +15,7 @@ html {
   background-color: var(--color-deep-slate);
   color: var(--color-snow);
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
