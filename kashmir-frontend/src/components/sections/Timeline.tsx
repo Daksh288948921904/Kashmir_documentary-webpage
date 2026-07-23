@@ -179,10 +179,11 @@ function PhotoCard({ event }: { event: TimelineEvent }) {
         {/* Image attribution */}
         {event.imgUrl?.includes('wikimedia.org') && (
           <div aria-hidden style={{
-            position: 'absolute', bottom: '5px', right: '6px',
-            fontFamily: 'var(--font-mono)', fontSize: '0.42rem',
-            color: 'rgba(255,255,255,0.32)', letterSpacing: '0.04em',
+            position: 'absolute', bottom: '6px', right: '8px',
+            fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+            color: 'rgba(255,255,255,0.65)', letterSpacing: '0.04em',
             pointerEvents: 'none', userSelect: 'none',
+            textShadow: '0 1px 3px rgba(0,0,0,0.8)',
           }}>
             © Wikimedia Commons
           </div>
