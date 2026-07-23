@@ -179,11 +179,13 @@ function PhotoCard({ event }: { event: TimelineEvent }) {
         {/* Image attribution */}
         {event.imgUrl?.includes('wikimedia.org') && (
           <div aria-hidden style={{
-            position: 'absolute', bottom: '6px', right: '8px',
-            fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
-            color: 'rgba(255,255,255,0.65)', letterSpacing: '0.04em',
+            position: 'absolute', bottom: '7px', right: '7px',
+            fontFamily: 'var(--font-mono)', fontSize: '0.58rem',
+            color: 'rgba(255,255,255,0.8)', letterSpacing: '0.04em',
             pointerEvents: 'none', userSelect: 'none',
-            textShadow: '0 1px 3px rgba(0,0,0,0.8)',
+            background: 'rgba(0,0,0,0.55)',
+            padding: '2px 6px',
+            borderRadius: '3px',
           }}>
             © Wikimedia Commons
           </div>
@@ -540,7 +542,7 @@ export default function Timeline() {
       {/* ══ Sticky archive header ══════════════════════════════════════════ */}
       <div style={{
         position: 'sticky',
-        top: 0,
+        top: 72,
         zIndex: 20,
         background: 'rgba(6,8,10,0.97)',
         backdropFilter: 'blur(20px)',

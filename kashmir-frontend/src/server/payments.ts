@@ -96,7 +96,7 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
     amount,
     currency,
     isocurrency:    'INR',
-    chmod:          isdefault,
+    isdefault,
     buyerEmail:     input.email,
     buyerPhone:     input.phone,
     buyerFirstName,
