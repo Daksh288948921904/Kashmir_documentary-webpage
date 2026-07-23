@@ -52,7 +52,7 @@ export const CONFIG = {
 
   /* ── Media ───────────────────────────── */
   media: {
-    trailerUrl: process.env.NEXT_PUBLIC_TRAILER_URL ?? 'https://drive.google.com/file/d/1Qsl_BWfq9hNnXqBkknqQoja_c_M4vgK1/preview',
+    trailerUrl: process.env.NEXT_PUBLIC_TRAILER_URL ?? 'https://www.youtube.com/embed/YyFcAwH4YZ0',
     /* Full film URL — empty = requires payment */
     filmUrl: process.env.NEXT_PUBLIC_FILM_URL ?? '',
     posterUrl: process.env.NEXT_PUBLIC_POSTER_URL ?? '/poster.jpg',
