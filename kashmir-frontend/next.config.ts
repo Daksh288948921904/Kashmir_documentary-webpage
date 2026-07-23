@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // jose v6 is pure ESM — tell Next.js not to bundle it so Node.js can resolve it natively.
+  serverExternalPackages: ['jose'],
+
   images: {
     remotePatterns: [
       {

@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-import { SignJWT, jwtVerify, type JWTPayload } from 'jose';
 import { getServerSettings } from '@/server/config';
 
 export interface AirpayOrderInput {
@@ -142,24 +141,45 @@ export async function verifyAirpayCallback(formData: Record<string, string>): Pr
     return { verified: false, message: `Payment failed: ${message}` };
   }
 
-  const key        = new TextEncoder().encode(s.jwtSecret);
   const expSeconds = Math.floor(Date.now() / 1000) + s.accessTokenExpireMinutes * 60;
-  const token      = await new SignJWT({})
-    .setProtectedHeader({ alg: s.jwtAlgorithm })
-    .setSubject(apTxnId || txnId)
-    .setExpirationTime(expSeconds)
-    .sign(key);
+  const token      = signJwt({ sub: apTxnId || txnId, exp: expSeconds }, s.jwtSecret);
 
   return { verified: true, access_token: token, message: 'Payment verified' };
 }
 
-export async function verifyAccessToken(token: string): Promise<JWTPayload | null> {
+export async function verifyAccessToken(token: string): Promise<Record<string, unknown> | null> {
   const s = getServerSettings();
   try {
-    const key = new TextEncoder().encode(s.jwtSecret);
-    const { payload } = await jwtVerify(token, key, { algorithms: [s.jwtAlgorithm] });
-    return payload;
+    return verifyJwt(token, s.jwtSecret);
   } catch {
     return null;
   }
+}
+
+/* ── Minimal JWT via Node.js crypto (no jose dependency) ───────────────── */
+function b64url(buf: Buffer): string {
+  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+function signJwt(payload: Record<string, unknown>, secret: string): string {
+  const header  = b64url(Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })));
+  const body    = b64url(Buffer.from(JSON.stringify(payload)));
+  const sig     = b64url(
+    crypto.createHmac('sha256', secret).update(`${header}.${body}`).digest(),
+  );
+  return `${header}.${body}.${sig}`;
+}
+
+function verifyJwt(token: string, secret: string): Record<string, unknown> {
+  const [header, body, sig] = token.split('.');
+  if (!header || !body || !sig) throw new Error('invalid token');
+  const expected = b64url(
+    crypto.createHmac('sha256', secret).update(`${header}.${body}`).digest(),
+  );
+  if (sig !== expected) throw new Error('invalid signature');
+  const payload = JSON.parse(Buffer.from(body, 'base64').toString()) as Record<string, unknown>;
+  if (typeof payload.exp === 'number' && payload.exp < Math.floor(Date.now() / 1000)) {
+    throw new Error('token expired');
+  }
+  return payload;
 }
