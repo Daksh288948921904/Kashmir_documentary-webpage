@@ -75,20 +75,23 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
     input.phone, buyerPinCode,
   ].join('~:~');
 
-  const checksum = sha256(`${sKey}@${buyerData}`);
+  // Two checksum formula variants seen in Airpay integrations:
+  // Formula A: SHA256(skey@buyerData)        where skey = SHA256(username~:~password)
+  // Formula B: SHA256(privatekey@buyerData)  where privatekey = SHA256(apiKey@username:|:password)
+  const checksumA = sha256(`${sKey}@${buyerData}`);
+  const checksumB = sha256(`${privateKey}@${buyerData}`);
+  const checksum  = checksumB; // trying formula B — A was rejected
 
   const callbackUrl = `${s.frontendUrl}/api/payment/callback`;
 
-  // ── Debug logs (visible in Vercel / Render function logs) ─────────────────
-  // skey is sha256(username~:~password). Expected value with .env.local creds:
-  //   d3d01234a5a79f7c59d2a7582cffc9092d2b3e2d7d58c49e14ab43ec3dcff4f3
-  // If skey below differs, Vercel AIRPAY_USERNAME / AIRPAY_PASSWORD is wrong.
-  console.log('[airpay] mercid    :', merchantId);
-  console.log('[airpay] skey      :', sKey);
-  console.log('[airpay] amount    :', amount);
-  console.log('[airpay] buyer_data:', buyerData);
-  console.log('[airpay] checksum  :', checksum);
-  console.log('[airpay] callback  :', callbackUrl);
+  console.log('[airpay] mercid      :', merchantId);
+  console.log('[airpay] skey        :', sKey);
+  console.log('[airpay] privatekey  :', privateKey);
+  console.log('[airpay] amount      :', amount);
+  console.log('[airpay] buyer_data  :', buyerData);
+  console.log('[airpay] checksumA   :', checksumA, '← SHA256(skey@data)');
+  console.log('[airpay] checksumB   :', checksumB, '← SHA256(privatekey@data) [SENDING]');
+  console.log('[airpay] callback    :', callbackUrl);
 
   const formFields: Record<string, string> = {
     mercid:         merchantId,
