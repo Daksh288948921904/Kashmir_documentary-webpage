@@ -48,12 +48,24 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
   const privateKey = sha256(`${apiKey}@${username}:|:${password}`);
   const sKey       = sha256(`${username}~:~${password}`);
 
+  // Build form values first — checksum must use IDENTICAL values to what the form sends.
+  // Airpay recomputes checksum from the posted fields; any mismatch → "Wrong Checksum".
+  const buyerFirstName = input.name;
+  const buyerLastName  = '';          // we don't collect last name separately
+  const buyerAddress   = input.address  ?? '';
+  const buyerCity      = input.city     ?? '';
+  const buyerState     = input.state    ?? '';
+  const buyerCountry   = input.country  ?? 'India';
+  const buyerPinCode   = input.pin_code ?? '';
+  const isdefault      = '0';
+  const txnsubtype     = '';          // must be '' here AND in the form field
+
   // Airpay checksum: email~:~fname~:~lname~:~addr~:~city~:~state~:~country~:~amount~:~orderid~:~currency~:~isdefault~:~isocurrency~:~txnsubtype~:~phone~:~pincode
   const buyerData = [
-    input.email, input.name, input.name,
-    input.address ?? '', input.city ?? '', input.state ?? '',
-    input.country ?? 'India', amount, txnId, currency, '0', 'INR', '0',
-    input.phone, input.pin_code ?? '',
+    input.email, buyerFirstName, buyerLastName,
+    buyerAddress, buyerCity, buyerState,
+    buyerCountry, amount, txnId, currency, isdefault, 'INR', txnsubtype,
+    input.phone, buyerPinCode,
   ].join('~:~');
 
   const checksum = sha256(`${sKey}@${buyerData}`);
@@ -66,19 +78,19 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
     amount,
     currency,
     isocurrency:    'INR',
-    chmod:          '0',
+    chmod:          isdefault,
     buyerEmail:     input.email,
     buyerPhone:     input.phone,
-    buyerFirstName: input.name,
-    buyerLastName:  '',
-    buyerAddress:   input.address ?? '',
-    buyerCity:      input.city ?? '',
-    buyerState:     input.state ?? '',
-    buyerCountry:   input.country ?? 'India',
-    buyerPinCode:   input.pin_code ?? '',
+    buyerFirstName,
+    buyerLastName,
+    buyerAddress,
+    buyerCity,
+    buyerState,
+    buyerCountry,
+    buyerPinCode,
     privatekey:     privateKey,
     checksum,
-    txnsubtype:     '',
+    txnsubtype,
     redirecturl:    callbackUrl,
   };
 
