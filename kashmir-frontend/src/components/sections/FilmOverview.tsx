@@ -132,7 +132,8 @@ export default function FilmOverview() {
             Documentary · Kashmir · {FILM.releaseYear}
           </p>
 
-          <div style={{
+          {/* Portrait poster — mobile only */}
+          <div className="poster-portrait-only" style={{
             position: 'relative', width: '360px', maxWidth: '90vw', margin: '0 auto',
             borderRadius: 'var(--radius-sm)', overflow: 'hidden',
             boxShadow: '0 40px 100px rgba(0,0,0,0.6)',
@@ -145,7 +146,25 @@ export default function FilmOverview() {
               style={{
                 width: '100%', height: 'auto', aspectRatio: '5/7',
                 objectFit: 'cover', objectPosition: 'center top',
-                filter: 'brightness(1)',
+                display: 'block',
+              }}
+            />
+          </div>
+
+          {/* Landscape poster — desktop only */}
+          <div className="poster-landscape-only" style={{
+            position: 'relative', width: '100%', maxWidth: '860px', margin: '0 auto',
+            borderRadius: 'var(--radius-sm)', overflow: 'hidden',
+            boxShadow: '0 40px 100px rgba(0,0,0,0.6)',
+          }}>
+            <Image
+              src={CONFIG.sectionImages.posterLandscape}
+              alt={`${FILM.title} — film poster`}
+              width={860}
+              height={484}
+              style={{
+                width: '100%', height: 'auto', aspectRatio: '16/9',
+                objectFit: 'cover', objectPosition: 'center center',
                 display: 'block',
               }}
             />

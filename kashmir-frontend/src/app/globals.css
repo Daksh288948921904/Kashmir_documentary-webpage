@@ -394,6 +394,17 @@ a {
 }
 
 /* ─────────────────────────────────────────────
+   RESPONSIVE POSTER — portrait on mobile, landscape on desktop
+   ───────────────────────────────────────────── */
+.poster-portrait-only  { display: block; }
+.poster-landscape-only { display: none;  }
+
+@media (min-width: 768px) {
+  .poster-portrait-only  { display: none;  }
+  .poster-landscape-only { display: block; }
+}
+
+/* ─────────────────────────────────────────────
    DUALITY — Mobile layout (lower-third)
    ───────────────────────────────────────────── */
 

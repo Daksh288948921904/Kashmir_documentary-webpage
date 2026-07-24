@@ -56,6 +56,7 @@ export const CONFIG = {
     /* Full film URL — empty = requires payment */
     filmUrl: process.env.NEXT_PUBLIC_FILM_URL ?? '',
     posterUrl: process.env.NEXT_PUBLIC_POSTER_URL ?? '/poster.jpg',
+    posterLandscapeUrl: '/poster-landscape.jpg',
   },
 
   /* ── Hero Images (Pexels Kashmir placeholders — swap for production stills) ── */
@@ -70,8 +71,8 @@ export const CONFIG = {
 
   /* ── Section Images (used in Film Overview, Duality, etc.) ── */
   sectionImages: {
-    /* Kashmir valley for Film/Overview section poster */
-    poster: '/poster.jpg',
+    poster:          '/poster.jpg',
+    posterLandscape: '/poster-landscape.jpg',
   },
 
   /* ── Features / Coming Soon Toggles ──── */

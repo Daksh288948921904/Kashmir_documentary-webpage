@@ -124,7 +124,7 @@ export default function Trailer() {
           data-cursor-hover={CONFIG.features.trailerAvailable || undefined}
           onClick={handlePlayClick}
         >
-          {/* Poster / background image */}
+          {/* Portrait poster — mobile */}
           <Image
             src={CONFIG.media.posterUrl}
             alt={FILM.title}
@@ -132,9 +132,28 @@ export default function Trailer() {
             quality={85}
             sizes="(max-width: 960px) 95vw, 900px"
             priority={false}
+            className="poster-portrait-only"
             style={{
               objectFit: 'cover',
               objectPosition: 'center top',
+              filter: CONFIG.features.trailerAvailable
+                ? `brightness(${hovered ? 0.5 : 1})`
+                : 'brightness(1)',
+              transition: 'filter 600ms ease',
+            }}
+          />
+          {/* Landscape poster — desktop (16:9 frame fits perfectly) */}
+          <Image
+            src={CONFIG.media.posterLandscapeUrl}
+            alt={FILM.title}
+            fill
+            quality={85}
+            sizes="(max-width: 960px) 95vw, 900px"
+            priority={false}
+            className="poster-landscape-only"
+            style={{
+              objectFit: 'cover',
+              objectPosition: 'center center',
               filter: CONFIG.features.trailerAvailable
                 ? `brightness(${hovered ? 0.5 : 1})`
                 : 'brightness(1)',
