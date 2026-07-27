@@ -28,7 +28,7 @@ const WITNESSES: Witness[] = [
     description: 'A relentless voyager seeking the unvarnished truth, navigating the fog of a fractured land to become a quiet vessel for its untold grief. Sitting face-to-face with shattered victims, a captive militant, and the weary guardians of Kashmir, this journey is a profound excavation of the human soul. With every steady question, the broken threads of the valley are woven together — bridging the agonizing chasm between those who bleed to protect it, those manipulated to destroy it, and those left mourning in the dark.',
     image: '/people/witness-01.png',
     objectPosition: '50% 20%',
-    revealMs: 1800,
+    revealMs: 800,
     line1: '"Beyond the curated broadcasts lies a forgotten landscape where grief wears no single uniform."',
     line2: '"My lens sought to understand the chaos, but captured instead the tragic portrait of a people bleeding from within."',
     note: 'Truth is the echo that remains long after the gunfire fades.',
@@ -41,7 +41,7 @@ const WITNESSES: Witness[] = [
     description: 'His gaze carries the heavy, quiet wreckage of a shattered illusion. Lured across the mountains by whispered tales of an oppressed brotherhood, he was forged into an instrument for a holy war that only existed in the minds of his handlers. He brought borrowed fire to save a people he believed were suffering, only to find that the very hands that disarmed him belonged to the brothers he was sent to rescue. This is the terrifying reality of the unseen proxy war — a generation hollowed out by distant architects of chaos, who weaponize innocent devotion to burn a harmony they were told was already in ashes.',
     image: '/people/witness-02.png',
     objectPosition: '50% 25%',
-    revealMs: 1600,
+    revealMs: 700,
     line1: '"They gave me a fire to burn the chains of my brothers, but the only prisoner in the dark was me."',
     line2: '"I crossed a border to save my faith, only to realize the men who captured me were the ones actually protecting it."',
     note: 'The cruelest wars are fought with the weapons of manipulated devotion.',
@@ -54,7 +54,7 @@ const WITNESSES: Witness[] = [
     description: 'At just fifteen, his son\'s innocent mind was hijacked — lured from the sanctuary of home and consumed by the fatal mirage of extremism. Today, this father stands entirely alone in the quiet devastation of a shattered house. Broken by the waiting, the boy\'s mother lies permanently bedridden, her mind fractured by a grief too heavy to bear. Left to navigate these ruins, the father carries an impossible tragedy: knowing his boy is still out there, yet irreparably lost to an ideology that burned the only bridge back to the family who loves him.',
     image: '/people/witness-03.png',
     objectPosition: '50% 20%',
-    revealMs: 2000,
+    revealMs: 900,
     line1: '"His son called him once... He begged the boy for just one final meeting, but the voice on the line whispered that the shadows he chose allow no return."',
     line2: '"Grief has shattered his mother\'s reality. Bedridden and a ghost in her own home, she endlessly begs the empty walls to give back her little boy."',
     note: 'Extremism\'s cruelest theft is erasing a child\'s path back to the arms that raised him.',
@@ -67,7 +67,7 @@ const WITNESSES: Witness[] = [
     description: 'The familiar footsteps they waited for will never arrive. He was a dedicated policeman returning from his shift — a man defined by his unwavering duty and the fierce, sheltering love he poured into his daughters. Now, they are thrust into a sudden, terrifying reality. Their home, once kept safe by his warmth, is entirely hollowed out by his violent erasure. Stripped of his profound love, these girls are forced to walk into a daunting future without their protector, carrying the brutal weight of a single question: what was his fault, other than standing as an uncompromising shield of law against those who crave violence?',
     image: '/people/witness-04.png',
     objectPosition: '50% 30%',
-    revealMs: 2200,
+    revealMs: 950,
     line1: '"What was his fault? That he stood for the law and became a hurdle for those who bring terror? He only wanted to protect his people and bring his love home to us."',
     line2: '"God took our angel back. A soul that pure was never meant to bleed in a world this dark."',
     note: 'The heaviest price of duty is paid by the daughters left waiting for a love that will never return.',
@@ -80,7 +80,7 @@ const WITNESSES: Witness[] = [
     description: 'She endured years of crushing poverty to educate him, trusting he would be the one to finally pull their family out of hardship. He was the heartbeat of their home — a devoted son who would walk through the door and immediately call out for his mother. But at twenty-two, everything she built was erased. Brainwashed by extremists, he turned his back on the parents who starved to raise him. He abandoned his education and his mother\'s unconditional love for a violent path, leaving her to mourn a boy who is still alive but entirely lost to them.',
     image: '/people/witness-05.png',
     objectPosition: '50% 20%',
-    revealMs: 1600,
+    revealMs: 700,
     line1: '"He wouldn\'t rest until he heard my voice. How did they convince my boy that a gun was worth more than his mother?"',
     line2: '"We starved to buy his books and build his future. In a single day, they poisoned his mind and took it all away."',
     note: 'The deepest tragedy of radicalization is the family left behind to mourn a living son.',
@@ -93,7 +93,7 @@ const WITNESSES: Witness[] = [
     description: 'He wore his uniform to uphold the law and his turban with unwavering pride. On a routine journey, his bus was intercepted by a crowd weaponized by foreign extremists who distort the peaceful tenets of faith to sow chaos. Targeted solely for being a Sikh law enforcer, he was dragged into the street and relentlessly beaten with stones and rods. The trauma was so profound that doctors recorded a rare medical anomaly: his heart physically ruptured from the blunt force. He fell not to a clash of religions, but to a violent mirage orchestrated by those who profit from a fractured society.',
     image: '/people/witness-06.png',
     objectPosition: '50% 25%',
-    revealMs: 2000,
+    revealMs: 900,
     line1: '"The stones that physically ruptured his heart were thrown by hands guided by a borrowed hatred."',
     line2: '"He lived to guard their peace, yet died at their hands — a protector sacrificed to a violent lie masquerading as faith."',
     note: 'The deepest tragedy of a hijacked narrative is watching a community destroy its own shield.',
@@ -106,7 +106,7 @@ const WITNESSES: Witness[] = [
     description: "He raised his boy to proudly wear the police uniform and continue their family's legacy, resting in the quiet comfort that this strong son would one day carry him to his final rest. But time delivered a crushing betrayal. On the exact morning their home awoke for his daughter's wedding — a date lovingly fixed by the brother she just lost — an aging father was forced to shoulder his child's casket instead. Wiping his tears in a house dressed for a celebration, he finds his only anchor in faith, surrendering to a heartbreaking truth: his son was a sacred gift from Allah, and the ultimate test of a father's love is yielding that blessing back to the Creator.",
     image: '/people/witness-07.png',
     objectPosition: '50% 20%',
-    revealMs: 1800,
+    revealMs: 800,
     line1: '"He was the one who fixed the date for his sister\'s wedding. We awoke expecting to celebrate, only to carry my boy out of a house still draped in flowers."',
     line2: '"You raise a boy trusting he will carry you at the end. You never prepare to carry him."',
     note: 'The cruelest theft of time is a father shouldering the child who was meant to carry him home.',
@@ -119,7 +119,7 @@ const WITNESSES: Witness[] = [
     description: "The true weight of command in Kashmir is measured not by casualties, but by the fragile lives pulled back from radicalization. For this officer, the conflict hinges on deconstructing a single word: Terror-ism. While physical terror can be swiftly neutralized by military might, the ism — a deeply entrenched, heavily funded nexus of radical ideology — is the true enemy. Dismantling this toxic network demands immense restraint. Even during intense gunfights, his forces will pause to let families plead for surrenders, prioritizing the fight to salvage a generation's soul over the finality of a bullet.",
     image: '/people/witness-08.png',
     objectPosition: '50% 20%',
-    revealMs: 1800,
+    revealMs: 800,
     line1: '"I am not interested in terrorists killed. My pride is in how many we pull back from the fringe of becoming one."',
     line2: '"Force easily erases the \'terror.\' It is the \'ism\' — the entrenched belief system — that we must strike at the core."',
     note: 'True victory lies not in silencing the gun, but in dismantling the ideology that loaded it.',
@@ -132,7 +132,7 @@ const WITNESSES: Witness[] = [
     description: 'When intelligence pinpoints a hidden threat in the dead of night, the fragile silence of the valley is shattered by the calculated breach of a surgical strike. This is the raw, visceral reality of a close-quarters hunt through claustrophobic corridors, where elite operators confront heavily armed radicals hiding among the vulnerable. In these pitch-black rooms, there is no time for negotiation; the armed forces step directly into the lethal crossfire, absorbing the ultimate risk to ensure the innocent families trapped nearby survive to see the dawn.',
     image: '/people/witness-09.png',
     objectPosition: '50% 30%',
-    revealMs: 1800,
+    revealMs: 800,
     line1: '"We offer every chance for peace, but when they choose violence, we answer with absolute might. The terror will end; they only get to choose how."',
     line2: '"We are the final wall between chaos and the innocent. If they refuse to drop their weapons, we bring the darkness to ensure they never hold them again."',
     note: 'Terror will always meet its end; when peace is refused, absolute force is the final consequence.',
@@ -283,37 +283,37 @@ export default function Duality() {
     scheduleTimer(32, onFull); // ~2 frames: browser paints full-black, then we snap
   }
 
-  // Fade the black overlay back to clear (smooth 0.55s ease).
+  // Fade the black overlay back to clear.
   function fastReveal() {
     const el = blackoutDivRef.current;
     if (!el) return;
-    el.style.transition = 'opacity 0.55s ease';
+    el.style.transition = 'opacity 0.3s ease';
     el.style.opacity = '0';
   }
 
-  // Slow cinematic fade to black (used for the final exit, not witness cuts).
+  // Cinematic fade to black (used for the final exit, not witness cuts).
   function slowBlack(onFull: () => void) {
     const el = blackoutDivRef.current;
     if (!el) { onFull(); return; }
-    el.style.transition = 'opacity 1.2s ease';
+    el.style.transition = 'opacity 0.7s ease';
     el.style.opacity = '1';
-    scheduleTimer(1200, onFull);
+    scheduleTimer(700, onFull);
   }
 
-  // Medium fade to black (used for gallery exit — faster than slowBlack, softer than fastBlack).
+  // Medium fade to black (used for gallery exit).
   function mediumBlack(onFull: () => void) {
     const el = blackoutDivRef.current;
     if (!el) { onFull(); return; }
-    el.style.transition = 'opacity 0.5s ease';
+    el.style.transition = 'opacity 0.35s ease';
     el.style.opacity = '1';
-    scheduleTimer(500, onFull);
+    scheduleTimer(350, onFull);
   }
 
-  // Slow reveal — used after the exit fade so the conclusion text eases in gently.
+  // Reveal after exit fade so conclusion text eases in.
   function slowReveal() {
     const el = blackoutDivRef.current;
     if (!el) return;
-    el.style.transition = 'opacity 1.0s ease';
+    el.style.transition = 'opacity 0.6s ease';
     el.style.opacity = '0';
   }
 
@@ -428,10 +428,10 @@ export default function Duality() {
     }
 
     // Testimony reveal chain
-    scheduleTimer(600,  () => { setStep(1); setLocWarmth(1); });
-    scheduleTimer(1200, () => { setStep(2); setLocWarmth(2); });
-    scheduleTimer(1900, () => { setStep(3); setLocWarmth(3); });
-    scheduleTimer(2700, () => {
+    scheduleTimer(250,  () => { setStep(1); setLocWarmth(1); });
+    scheduleTimer(500,  () => { setStep(2); setLocWarmth(2); });
+    scheduleTimer(800,  () => { setStep(3); setLocWarmth(3); });
+    scheduleTimer(1200, () => {
       setStep(4);
       pulseLOC();
       if (emberRef.current && canvasRef.current) {
@@ -441,13 +441,13 @@ export default function Duality() {
 
     // Last witness: auto-trigger exit after reading time (cancelled if user scrolls first)
     if (idx === WITNESSES.length - 1) {
-      scheduleTimer(2700 + 600, () => {
+      scheduleTimer(1200 + 400, () => {
         if (!exitRef.current && !lockRef.current) exitTrigRef.current();
       });
     }
 
     // Ambient ripples start after portrait has revealed
-    scheduleTimer(w.revealMs + 500, () => {
+    scheduleTimer(w.revealMs + 300, () => {
       stopRippleInterval();
       addRipple();
       rippleIntervalRef.current = window.setInterval(addRipple, 3000);
@@ -522,10 +522,10 @@ export default function Duality() {
       });
     });
 
-    // Film title — 900ms after statement visible (~t=2250ms)
-    scheduleTimer(2250, () => { setExitPhase(3); exitPhaseRef.current = 3; });
-    // CTA + unlock — 900ms after film title (~t=3150ms)
-    scheduleTimer(3150, () => {
+    // Film title — 500ms after statement visible
+    scheduleTimer(1300, () => { setExitPhase(3); exitPhaseRef.current = 3; });
+    // CTA + unlock — 500ms after film title
+    scheduleTimer(1900, () => {
       setExitPhase(4); exitPhaseRef.current = 4;
       lockRef.current = false;
       pendingGalleryTimerRef.current = window.setTimeout(() => {
@@ -537,7 +537,7 @@ export default function Duality() {
           reviewSelectedRef.current = null;
           sectionPassedRef.current = true;
         }
-      }, 800);
+      }, 500);
     });
   };
 
