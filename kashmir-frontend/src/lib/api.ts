@@ -10,7 +10,7 @@
 import { CONFIG } from '@/lib/config';
 import type {
   TimelineResponse, NewsResponse, SocialResponse,
-  DocumentaryTimestamps, AirpayOrder,
+  DocumentaryTimestamps, CreateOrderResult,
   AccessToken, AccessVerification,
 } from '@/types/api';
 
@@ -131,10 +131,10 @@ export const api = {
   },
 
   /* Payment — create Airpay order, returns form fields for redirect */
-  createAirpayOrder: async (data: {
+  createOrder: async (data: {
     email: string; name: string; phone: string;
     address?: string; city?: string; state?: string; pin_code?: string;
-  }): Promise<AirpayOrder | null> => {
+  }): Promise<CreateOrderResult | null> => {
     try {
       const res = await fetch(`${BASE}/payment/create-order`, {
         method:  'POST',
@@ -142,7 +142,7 @@ export const api = {
         body:    JSON.stringify(data),
       });
       if (!res.ok) return null;
-      return (await res.json()) as AirpayOrder;
+      return (await res.json()) as CreateOrderResult;
     } catch { return null; }
   },
 

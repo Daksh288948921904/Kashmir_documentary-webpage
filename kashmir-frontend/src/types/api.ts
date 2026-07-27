@@ -92,13 +92,26 @@ export interface SocialResponse {
   fetched_at: string;
 }
 
-/* ── Payment (Airpay) ─────────────── */
+/* ── Payment ──────────────────────── */
 
 export interface AirpayOrder {
+  gateway: 'airpay';
   transaction_id: string;
   post_url: string;
   form_fields: Record<string, string>;
 }
+
+export interface RazorpayOrder {
+  gateway: 'razorpay';
+  order_id: string;
+  key_id: string;
+  amount: number;   // in paise
+  currency: string;
+  name: string;
+  description: string;
+}
+
+export type CreateOrderResult = AirpayOrder | RazorpayOrder;
 
 /* Backend returns { verified, access_token?, message } */
 export interface AccessToken {

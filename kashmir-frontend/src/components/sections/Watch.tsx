@@ -388,7 +388,7 @@ export default function Watch() {
     return () => { hls?.destroy(); };
   }, [session]);
 
-  /* Airpay payment flow — creates order then submits a hidden form to Airpay */
+  /* Payment flow — dispatches to Airpay (form submit) or Razorpay (JS modal) */
   const handleWatch = async () => {
     if (!payName.trim()) { setPayError('Please enter your full name.'); return; }
     if (!EMAIL_RE.test(payEmail)) { setPayError('Please enter a valid email address.'); return; }
@@ -397,7 +397,7 @@ export default function Watch() {
     setPaying(true);
     setPayError(null);
 
-    const order = await api.createAirpayOrder({
+    const order = await api.createOrder({
       email: payEmail.trim(),
       name:  payName.trim(),
       phone: payPhone.trim(),
@@ -409,6 +409,66 @@ export default function Watch() {
       return;
     }
 
+    if (order.gateway === 'razorpay') {
+      // Load Razorpay checkout script then open the modal
+      const loadScript = () => new Promise<void>((resolve, reject) => {
+        if ((window as any).Razorpay) { resolve(); return; }
+        const s = document.createElement('script');
+        s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        s.onload  = () => resolve();
+        s.onerror = () => reject(new Error('Failed to load Razorpay'));
+        document.body.appendChild(s);
+      });
+
+      try {
+        await loadScript();
+      } catch {
+        setPayError('Could not load payment window. Please try again.');
+        setPaying(false);
+        return;
+      }
+
+      const rzp = new (window as any).Razorpay({
+        key:         order.key_id,
+        order_id:    order.order_id,
+        amount:      order.amount,
+        currency:    order.currency,
+        name:        order.name,
+        description: order.description,
+        prefill: {
+          name:    payName.trim(),
+          email:   payEmail.trim(),
+          contact: payPhone.trim(),
+        },
+        theme: { color: '#c97b2b' },
+        handler: async (response: {
+          razorpay_payment_id: string;
+          razorpay_order_id:   string;
+          razorpay_signature:  string;
+        }) => {
+          // Verify signature server-side
+          const res = await fetch('/api/payment/callback', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(response),
+          });
+          const data = await res.json() as { success: boolean; token?: string; message?: string };
+          if (data.success && data.token) {
+            window.location.href = `/?payment=success&token=${data.token}#watch`;
+          } else {
+            setPayError(data.message ?? 'Payment verification failed. Please contact support.');
+            setPaying(false);
+          }
+        },
+        modal: {
+          ondismiss: () => { setPaying(false); },
+        },
+      });
+      rzp.open();
+      return;
+    }
+
+    // Airpay — hidden form submit
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = order.post_url;

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createAirpayOrder } from '@/server/payments';
+import { createAirpayOrder, createRazorpayOrder } from '@/server/payments';
+import { getServerSettings } from '@/server/config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -8,16 +9,22 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const result = await createAirpayOrder({
-      email:     body.email,
-      name:      body.name,
-      phone:     body.phone,
-      address:   body.address,
-      city:      body.city,
-      state:     body.state,
-      country:   body.country,
-      pin_code:  body.pin_code,
-    });
+    const input = {
+      email:    body.email,
+      name:     body.name,
+      phone:    body.phone,
+      address:  body.address,
+      city:     body.city,
+      state:    body.state,
+      country:  body.country,
+      pin_code: body.pin_code,
+    };
+
+    const { paymentGateway } = getServerSettings();
+    const result = paymentGateway === 'razorpay'
+      ? await createRazorpayOrder(input)
+      : await createAirpayOrder(input);
+
     return NextResponse.json(result);
   } catch (e) {
     return NextResponse.json(

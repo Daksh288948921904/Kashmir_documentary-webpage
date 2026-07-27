@@ -13,10 +13,23 @@ export interface AirpayOrderInput {
 }
 
 export interface AirpayOrderResult {
+  gateway: 'airpay';
   transaction_id: string;
   post_url: string;
   form_fields: Record<string, string>;
 }
+
+export interface RazorpayOrderResult {
+  gateway: 'razorpay';
+  order_id: string;   // Razorpay order id (order_xxx)
+  key_id: string;     // publishable key — safe to send to client
+  amount: number;     // in paise
+  currency: string;
+  name: string;
+  description: string;
+}
+
+export type CreateOrderResult = AirpayOrderResult | RazorpayOrderResult;
 
 export interface VerifyCallbackResult {
   verified: boolean;
@@ -116,6 +129,7 @@ export async function createAirpayOrder(input: AirpayOrderInput): Promise<Airpay
   };
 
   return {
+    gateway:        'airpay',
     transaction_id: txnId,
     post_url:       s.airpayBaseUrl,
     form_fields:    formFields,
@@ -185,4 +199,68 @@ function verifyJwt(token: string, secret: string): Record<string, unknown> {
     throw new Error('token expired');
   }
   return payload;
+}
+
+/* ── Razorpay ───────────────────────────────────────────────────────────── */
+
+export async function createRazorpayOrder(input: AirpayOrderInput): Promise<RazorpayOrderResult> {
+  const s = getServerSettings();
+  const keyId     = clean(s.razorpayKeyId);
+  const keySecret = clean(s.razorpayKeySecret);
+
+  if (!keyId || !keySecret) {
+    throw new Error('Razorpay credentials not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.');
+  }
+
+  const amountPaise = Math.round(parseFloat(String(s.documentaryPriceInr)) * 100);
+  const receipt     = `KFP${Date.now()}`;
+
+  const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+  const res  = await fetch('https://api.razorpay.com/v1/orders', {
+    method:  'POST',
+    headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ amount: amountPaise, currency: 'INR', receipt }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Razorpay order creation failed: ${err}`);
+  }
+
+  const data = await res.json() as { id: string };
+
+  console.log('[razorpay] order_id:', data.id, '| amount_paise:', amountPaise);
+
+  return {
+    gateway:     'razorpay',
+    order_id:    data.id,
+    key_id:      keyId,
+    amount:      amountPaise,
+    currency:    'INR',
+    name:        'Kashmir — Fighting for Peace',
+    description: 'Documentary film access',
+  };
+}
+
+export async function verifyRazorpayPayment(
+  razorpay_order_id: string,
+  razorpay_payment_id: string,
+  razorpay_signature: string,
+): Promise<VerifyCallbackResult> {
+  const s = getServerSettings();
+  const keySecret = clean(s.razorpayKeySecret);
+
+  const expected = crypto
+    .createHmac('sha256', keySecret)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    .digest('hex');
+
+  if (expected !== razorpay_signature) {
+    return { verified: false, message: 'Invalid payment signature' };
+  }
+
+  const expSeconds = Math.floor(Date.now() / 1000) + s.accessTokenExpireMinutes * 60;
+  const token      = signJwt({ sub: razorpay_payment_id, exp: expSeconds }, s.jwtSecret);
+
+  return { verified: true, access_token: token, message: 'Payment verified' };
 }
